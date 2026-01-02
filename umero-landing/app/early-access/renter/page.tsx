@@ -13,31 +13,30 @@ export default function RenterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const payload = {
-      type: "renter",
-      data: {
-        name,
-        email,
-        city,
-        contact,
-        rentalDuration,
-        peopleCount,
-      },
-    };
+    const formData = new FormData();
+
+    formData.append("type", "renter");
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("city", city);
+    formData.append("contact", contact);
+    formData.append("rentalDuration", rentalDuration);
+    formData.append("peopleCount", peopleCount);
 
     const res = await fetch("/api/submissions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: formData, // ✅ NO headers
     });
 
-    if (res.ok) {
-      const result = await res.json();
-      localStorage.setItem("submissionId", result.submissionId);
-      router.push("/submission-success");
-    } else {
+    if (!res.ok) {
       alert("Submission failed. Please try again.");
+      return;
     }
+
+    const data = await res.json();
+    localStorage.setItem("submissionId", data.submissionId);
+
+    router.push("/submission-success");
   };
 
   return (

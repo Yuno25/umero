@@ -1,35 +1,32 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
 
-    const submission = {
-      id: crypto.randomUUID(),
-      type: formData.get("type"),
-      data: {
-        name: formData.get("name"),
-        email: formData.get("email"),
-        city: formData.get("city"),
-        contact: formData.get("contact"),
-        propertyType: formData.get("propertyType"),
-        address: formData.get("address"),
+    // 🔴 LOG EVERYTHING
+    const entries: Record<string, any> = {};
+    for (const [key, value] of formData.entries()) {
+      entries[key] =
+        typeof value === "object" && "name" in value
+          ? { fileName: (value as File).name }
+          : value;
+    }
+
+    console.log("FORM DATA RECEIVED:", entries);
+
+    // 🔴 DO NOT PROCESS — JUST RESPOND
+    return NextResponse.json(
+      {
+        success: true,
+        received: entries,
       },
-      photos: formData.getAll("photos"), // 👈 FILES HERE
-      status: "pending",
-      createdAt: new Date().toISOString(),
-    };
-
-    console.log("Saved submission:", submission);
-
-    return Response.json(
-      { success: true, submissionId: submission.id },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (err) {
-    return Response.json(
-      { success: false, message: "Upload failed" },
-      { status: 500 }
-    );
+    console.error("HARD CRASH:", err);
+    return NextResponse.json({ error: "Crash" }, { status: 500 });
   }
 }
