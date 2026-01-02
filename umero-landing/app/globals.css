@@ -2,39 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+header {
+  pointer-events: auto;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base background */
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #020617; /* deep black */
+  color: #e5e7eb;
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* Glass container */
+.glass {
+  background: rgba(2, 6, 23, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Glass button */
+.btn-glass {
+  padding: 0.6rem 1.4rem;
+  border-radius: 0.75rem;
+  background: rgba(2, 6, 23, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+/* Purple glow hover */
+.btn-glass:hover {
+  background: rgba(91, 46, 255, 0.25);
+  box-shadow: 0 0 25px rgba(91, 46, 255, 0.45);
+  border-color: rgba(91, 46, 255, 0.6);
+}
+.social-icon {
+  opacity: 0;
+  transform: translateY(16px) scale(0.9);
+}
+
+.social-icon.animate-in {
+  animation: socialFadeUp 0.6s ease forwards;
+}
+
+@keyframes socialFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
-.input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  font-size: 0.95rem;
+
+.social-icon:hover {
+  transform: scale(1.15);
+  transition: transform 0.2s ease;
+}
+/* === UMERO BUTTON STYLES === */
+
+.btn-primary {
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  color: white;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  transition: all 0.25s ease;
 }
 
-.input:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 1px #2563eb;
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.5),
+    0 10px 30px rgba(124, 58, 237, 0.35);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-weight: 500;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  transition: all 0.25s ease;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
 }

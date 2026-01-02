@@ -1,6 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+const router = useRouter();
+
+// after successful submit
+router.push("/submission-success");
 
 export default function EarlyAccessListerForm() {
   const [status, setStatus] = useState("");

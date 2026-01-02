@@ -1,8 +1,9 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent } from "react";
 
 export default function ListerPage() {
+  const router = useRouter(); // ✅ INSIDE component
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [city, setCity] = useState<string>("");
@@ -10,6 +11,40 @@ export default function ListerPage() {
   const [propertyType, setPropertyType] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [photos, setPhotos] = useState<FileList | null>(null);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    // text fields
+    formData.append("type", "lister");
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("city", city);
+    formData.append("contact", contact);
+    formData.append("propertyType", propertyType);
+    formData.append("address", address);
+
+    // file upload
+    if (photos) {
+      Array.from(photos).forEach((file) => {
+        formData.append("photos", file);
+      });
+    }
+
+    const res = await fetch("/api/submissions", {
+      method: "POST",
+      body: formData, // ❗ NO headers
+    });
+
+    if (res.ok) {
+      const result = await res.json();
+      localStorage.setItem("submissionId", result.submissionId);
+      router.push("/submission-success");
+    } else {
+      alert("Submission failed");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-slate-900 px-4">
@@ -25,7 +60,7 @@ export default function ListerPage() {
         </div>
 
         {/* Form */}
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name */}
           <input
             type="text"
@@ -114,11 +149,8 @@ export default function ListerPage() {
           </div>
 
           {/* Submit */}
-          <button
-            type="submit"
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-cyan-500 font-semibold hover:scale-105 transition"
-          >
-            Get Early Access
+          <button type="submit" className="btn-primary w-full">
+            Submit
           </button>
         </form>
       </div>

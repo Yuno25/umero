@@ -1,14 +1,44 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent } from "react";
 
 export default function RenterPage() {
+  const router = useRouter(); // ✅ INSIDE component
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [contact, setContact] = useState<string>("");
   const [rentalDuration, setRentalDuration] = useState<string>("");
   const [peopleCount, setPeopleCount] = useState<string>("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const payload = {
+      type: "renter",
+      data: {
+        name,
+        email,
+        city,
+        contact,
+        rentalDuration,
+        peopleCount,
+      },
+    };
+
+    const res = await fetch("/api/submissions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok) {
+      const result = await res.json();
+      localStorage.setItem("submissionId", result.submissionId);
+      router.push("/submission-success");
+    } else {
+      alert("Submission failed. Please try again.");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-slate-900 px-4">
@@ -22,7 +52,7 @@ export default function RenterPage() {
         </div>
 
         {/* Form */}
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name */}
           <input
             type="text"
@@ -101,11 +131,8 @@ export default function RenterPage() {
           </select>
 
           {/* Submit */}
-          <button
-            type="submit"
-            className="w-full py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-cyan-500 font-semibold hover:scale-105 transition"
-          >
-            Get Early Access
+          <button type="submit" className="btn-primary w-full">
+            Submit
           </button>
         </form>
       </div>
