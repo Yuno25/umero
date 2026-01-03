@@ -3,65 +3,87 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const router = useRouter();
-
-// after successful submit
-router.push("/submission-success");
-
 export default function EarlyAccessRenterForm() {
-  const [status, setStatus] = useState("");
+  const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setStatus("Submitting...");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    city: "",
+    rentalDuration: "",
+    peopleCount: 1,
+  });
 
-    const formData = new FormData(e.currentTarget);
-
-    await fetch("/api/early-access/renter", {
+  const handleSubmit = async () => {
+    const res = await fetch("/api/early-access/renter", {
       method: "POST",
-      body: JSON.stringify({
-        name: formData.get("name"),
-        email: formData.get("email"),
-        city: formData.get("city"),
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
     });
 
-    setStatus("You’re on the list!");
-    e.currentTarget.reset();
-  }
+    if (!res.ok) {
+      alert("Submission failed");
+      return;
+    }
+
+    router.push("/submission-success");
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 border p-6 rounded-lg">
-      <h3 className="text-xl font-semibold text-center">
-        Early Access — Renters
-      </h3>
+    <div className="glass p-8 rounded-2xl w-full max-w-lg">
+      <h2 className="text-xl font-bold mb-4">Renter Early Access</h2>
 
       <input
-        name="name"
-        placeholder="Your name"
-        required
-        className="w-full p-3 border rounded"
+        placeholder="Name"
+        value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        className="input"
       />
 
       <input
-        name="email"
-        type="email"
-        placeholder="Email address"
-        required
-        className="w-full p-3 border rounded"
+        placeholder="Email"
+        value={formData.email}
+        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        className="input"
       />
 
       <input
-        name="city"
-        placeholder="Your city"
-        className="w-full p-3 border rounded"
+        placeholder="City"
+        value={formData.city}
+        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+        className="input"
       />
 
-      <button className="w-full bg-blue-600 text-white py-3 rounded">
-        Join Early Access
+      <input
+        placeholder="Rental Duration"
+        value={formData.rentalDuration}
+        onChange={(e) =>
+          setFormData({ ...formData, rentalDuration: e.target.value })
+        }
+        className="input"
+      />
+
+      <input
+        type="number"
+        min={1}
+        placeholder="Number of People"
+        value={formData.peopleCount}
+        onChange={(e) =>
+          setFormData({
+            ...formData,
+            peopleCount: Number(e.target.value),
+          })
+        }
+        className="input"
+      />
+
+      <button
+        type="button"
+        onClick={handleSubmit}
+        className="btn-primary w-full mt-4"
+      >
+        Submit
       </button>
-
-      <p className="text-sm text-center">{status}</p>
-    </form>
+    </div>
   );
 }

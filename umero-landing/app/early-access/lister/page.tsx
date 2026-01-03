@@ -32,7 +32,7 @@ export default function ListerPage() {
       });
     }
 
-    const res = await fetch("/api/submissions", {
+    const res = await fetch("/api/early-access/lister", {
       method: "POST",
       body: formData, // ❗ NO headers
     });

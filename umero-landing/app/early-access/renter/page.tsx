@@ -23,7 +23,7 @@ export default function RenterPage() {
     formData.append("rentalDuration", rentalDuration);
     formData.append("peopleCount", peopleCount);
 
-    const res = await fetch("/api/submissions", {
+    const res = await fetch("/api/early-access/renter", {
       method: "POST",
       body: formData, // ✅ NO headers
     });

@@ -1,67 +1,76 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-const router = useRouter();
-
-// after successful submit
-router.push("/submission-success");
+import { useRef } from "react";
 
 export default function EarlyAccessListerForm() {
-  const [status, setStatus] = useState("");
+  const router = useRouter();
+  const formRef = useRef<HTMLDivElement>(null);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setStatus("Submitting...");
+  const handleSubmit = async () => {
+    if (!formRef.current) return;
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData();
 
-    await fetch("/api/early-access/lister", {
-      method: "POST",
-      body: JSON.stringify({
-        name: formData.get("name"),
-        email: formData.get("email"),
-        item: formData.get("item"),
-      }),
+    const inputs = formRef.current.querySelectorAll(
+      "input, textarea"
+    ) as NodeListOf<HTMLInputElement>;
+
+    inputs.forEach((input) => {
+      if (input.type === "file") {
+        if (input.files) {
+          Array.from(input.files).forEach((file) => {
+            formData.append("photos", file);
+          });
+        }
+      } else if (input.name && input.value) {
+        formData.append(input.name, input.value);
+      }
     });
 
-    setStatus("You’re on the list!");
-    e.currentTarget.reset();
-  }
+    const res = await fetch("/api/early-access/lister", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      alert("Submission failed");
+      return;
+    }
+
+    router.push("/submission-success");
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 border p-6 rounded-lg">
-      <h3 className="text-xl font-semibold text-center">
-        Early Access — Listers
-      </h3>
+    <div ref={formRef} className="glass p-8 rounded-2xl w-full max-w-lg">
+      <h2 className="text-xl font-bold mb-4">Lister Early Access</h2>
 
+      <input name="name" placeholder="Name" className="input" />
+      <input name="email" placeholder="Email" className="input" />
+      <input name="city" placeholder="City" className="input" />
       <input
-        name="name"
-        placeholder="Your name"
-        required
-        className="w-full p-3 border rounded"
+        name="propertyType"
+        placeholder="Property Type"
+        className="input"
+      />
+      <input name="contact" placeholder="Contact" className="input" />
+
+      {/* 📸 PHOTO UPLOAD */}
+      <input
+        type="file"
+        name="photos"
+        multiple
+        accept="image/*"
+        className="input mt-3"
       />
 
-      <input
-        name="email"
-        type="email"
-        placeholder="Email address"
-        required
-        className="w-full p-3 border rounded"
-      />
-
-      <input
-        name="item"
-        placeholder="What item would you list?"
-        className="w-full p-3 border rounded"
-      />
-
-      <button className="w-full bg-black text-white py-3 rounded">
-        Join Early Access
+      <button
+        type="button"
+        onClick={handleSubmit}
+        className="btn-primary w-full mt-4"
+      >
+        Submit
       </button>
-
-      <p className="text-sm text-center">{status}</p>
-    </form>
+    </div>
   );
 }
