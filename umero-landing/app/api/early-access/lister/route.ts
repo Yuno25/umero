@@ -1,53 +1,46 @@
-import { NextResponse } from "next/server";
-import cloudinary from "@/lib/cloudinary";
-import dbConnect from "@/lib/db";
+import { dbConnect } from "@/lib/db";
 import Lister from "@/models/Lister";
+import cloudinary from "@/lib/cloudinary";
 
 export async function POST(req: Request) {
   try {
     await dbConnect();
+
     const formData = await req.formData();
+    const photos = formData.getAll("photos") as File[];
 
-    // 🔹 TEXT FIELDS (SAFE)
-    const payload = {
-      name: formData.get("name")?.toString() || "",
-      email: formData.get("email")?.toString() || "",
-      city: formData.get("city")?.toString() || "",
-      propertyType: formData.get("propertyType")?.toString() || "",
-      contact: formData.get("contact")?.toString() || "",
-      address: formData.get("address")?.toString() || "",
-    };
-
-    // 🔹 MULTI PHOTO SAFE HANDLING
-    const files = formData.getAll("photos");
     const uploadedPhotos: string[] = [];
 
-    for (const file of files) {
-      if (!(file instanceof File)) continue;
-      if (file.size === 0) continue;
+    for (const photo of photos) {
+      if (!photo || typeof photo === "string") continue;
 
-      const buffer = Buffer.from(await file.arrayBuffer());
+      const bytes = await photo.arrayBuffer();
+      const buffer = Buffer.from(bytes);
 
-      const upload = await new Promise<any>((resolve, reject) => {
-        cloudinary.uploader
-          .upload_stream({ folder: "umero/listers" }, (err, result) => {
-            if (err) reject(err);
-            resolve(result);
-          })
-          .end(buffer);
+      const base64 = buffer.toString("base64");
+      const dataURI = `data:${photo.type};base64,${base64}`;
+
+      const uploadRes = await cloudinary.uploader.upload(dataURI, {
+        folder: "umero/listers",
       });
 
-      uploadedPhotos.push(upload.secure_url);
+      console.log("CLOUDINARY URL:", uploadRes.secure_url);
+
+      uploadedPhotos.push(uploadRes.secure_url);
     }
 
     await Lister.create({
-      ...payload,
+      name: formData.get("name"),
+      email: formData.get("email"),
+      city: formData.get("city"),
+      propertyType: formData.get("propertyType"),
+      contact: formData.get("contact"),
       photos: uploadedPhotos,
     });
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("LISTER API ERROR →", error);
-    return NextResponse.json({ error: "Submission failed" }, { status: 500 });
+    return new Response(JSON.stringify({ success: true }), { status: 201 });
+  } catch (err) {
+    console.error("LISTER SUBMIT ERROR:", err);
+    return new Response("Upload failed", { status: 500 });
   }
 }

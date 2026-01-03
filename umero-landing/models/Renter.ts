@@ -1,6 +1,6 @@
-import mongoose, { Schema, models } from "mongoose";
+import mongoose from "mongoose";
 
-const RenterSchema = new Schema(
+const RenterSchema = new mongoose.Schema(
   {
     name: String,
     email: String,
@@ -11,4 +11,4 @@ const RenterSchema = new Schema(
   { timestamps: true }
 );
 
-export default models.Renter || mongoose.model("Renter", RenterSchema);
+export default mongoose.models.Renter || mongoose.model("Renter", RenterSchema);

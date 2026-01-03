@@ -7,7 +7,6 @@ const ListerSchema = new mongoose.Schema(
     city: String,
     propertyType: String,
     contact: String,
-    address: String,
     photos: [String],
   },
   { timestamps: true }

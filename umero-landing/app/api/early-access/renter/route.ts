@@ -1,9 +1,9 @@
-import { connectDB } from "../../../../lib/db";
-import Renter from "../../../../models/Renter";
+import { dbConnect } from "@/lib/db";
+import Renter from "@/models/Renter";
 
 export async function POST(req: Request) {
   try {
-    await connectDB();
+    await dbConnect();
 
     const formData = await req.formData();
 
@@ -20,6 +20,6 @@ export async function POST(req: Request) {
     return new Response(JSON.stringify({ success: true }), { status: 201 });
   } catch (err) {
     console.error("RENTER SUBMIT ERROR:", err);
-    return new Response("error", { status: 500 });
+    return new Response(JSON.stringify({ success: false }), { status: 500 });
   }
 }
