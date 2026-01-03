@@ -6,84 +6,99 @@ import { useRouter } from "next/navigation";
 export default function EarlyAccessRenterForm() {
   const router = useRouter();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    city: "",
-    rentalDuration: "",
-    peopleCount: 1,
-  });
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("");
+  const [rentalDuration, setRentalDuration] = useState("");
+  const [peopleCount, setPeopleCount] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const fd = new FormData();
+    fd.append("name", name);
+    fd.append("email", email);
+    fd.append("city", city);
+    fd.append("rentalDuration", rentalDuration);
+    fd.append("peopleCount", String(peopleCount));
+
     const res = await fetch("/api/early-access/renter", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
+      body: fd, // ✅ NO headers
     });
 
-    if (!res.ok) {
-      alert("Submission failed");
-      return;
-    }
+    setLoading(false);
 
-    router.push("/submission-success");
+    if (res.ok) {
+      router.push("/submission-success");
+    } else {
+      alert("Renter submission failed");
+    }
   };
 
   return (
-    <div className="glass p-8 rounded-2xl w-full max-w-lg">
-      <h2 className="text-xl font-bold mb-4">Renter Early Access</h2>
+    <div className="glass p-8 rounded-2xl w-full max-w-lg border border-white/10">
+      <h2 className="text-xl font-semibold mb-2 text-white">
+        Renter – Early Access
+      </h2>
+      <p className="text-white/60 mb-6 text-sm">
+        Help us understand your rental needs early
+      </p>
 
-      <input
-        placeholder="Name"
-        value={formData.name}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        className="input"
-      />
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <input
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="input"
+          required
+        />
 
-      <input
-        placeholder="Email"
-        value={formData.email}
-        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        className="input"
-      />
+        <input
+          type="email"
+          placeholder="Email Address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="input"
+          required
+        />
 
-      <input
-        placeholder="City"
-        value={formData.city}
-        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-        className="input"
-      />
+        <input
+          placeholder="City"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="input"
+          required
+        />
 
-      <input
-        placeholder="Rental Duration"
-        value={formData.rentalDuration}
-        onChange={(e) =>
-          setFormData({ ...formData, rentalDuration: e.target.value })
-        }
-        className="input"
-      />
+        <input
+          placeholder="Rental Duration (e.g. 3 months)"
+          value={rentalDuration}
+          onChange={(e) => setRentalDuration(e.target.value)}
+          className="input"
+          required
+        />
 
-      <input
-        type="number"
-        min={1}
-        placeholder="Number of People"
-        value={formData.peopleCount}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            peopleCount: Number(e.target.value),
-          })
-        }
-        className="input"
-      />
+        <input
+          type="number"
+          min={1}
+          placeholder="Number of People"
+          value={peopleCount}
+          onChange={(e) => setPeopleCount(Number(e.target.value))}
+          className="input"
+          required
+        />
 
-      <button
-        type="button"
-        onClick={handleSubmit}
-        className="btn-primary w-full mt-4"
-      >
-        Submit
-      </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary w-full mt-4 disabled:opacity-60"
+        >
+          {loading ? "Submitting..." : "Submit"}
+        </button>
+      </form>
     </div>
   );
 }
