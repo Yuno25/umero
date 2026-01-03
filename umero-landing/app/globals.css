@@ -91,3 +91,85 @@ body {
   border-color: rgba(255, 255, 255, 0.3);
   color: white;
 }
+/*animation 
+*/
+@keyframes floatSlow {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+
+/*early acees
+
+*/
+/* early access / section animations */
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.fade-up.animate {
+  animation: fadeUp 0.6s ease forwards;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+/*reach us */
+/* ===== Reach Us – Next Level Animations ===== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.reveal.active {
+  animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes revealUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* floating cards */
+.float-card {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+/* glowing pulse for CTA */
+.pulse-glow {
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 rgba(168, 85, 247, 0);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(168, 85, 247, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(168, 85, 247, 0);
+  }
+}

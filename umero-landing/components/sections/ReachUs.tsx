@@ -51,8 +51,16 @@ export default function ReachUs() {
       id="reach-us"
       className="relative flex flex-col items-center justify-center py-32 text-center"
     >
-      <h2 className="mb-4 text-3xl font-semibold text-white">Reach Us</h2>
-      <p className="mb-10 max-w-md text-white/70">
+      {/* TITLE */}
+      <h2 className="mb-4 text-3xl font-semibold text-white fade-up animate">
+        Reach Us
+      </h2>
+
+      {/* SUBTITLE */}
+      <p
+        className="mb-10 max-w-md text-white/70 fade-up animate"
+        style={{ animationDelay: "120ms" }}
+      >
         Have questions or want to collaborate? Reach out to us anytime.
       </p>
 
@@ -70,13 +78,17 @@ export default function ReachUs() {
               target={item.name !== "Email" ? "_blank" : undefined}
               rel="noopener noreferrer"
               style={{ transitionDelay: `${index * 120}ms` }}
-              className="group relative flex h-11 w-11 items-center justify-center rounded-full bg-white/5 border border-white/10 backdrop-blur-md transition-all
-                         hover:border-purple-400/50 hover:bg-purple-500/10"
+              className="group relative flex h-11 w-11 items-center justify-center
+                         rounded-full bg-white/5 border border-white/10 backdrop-blur-md
+                         transition-all duration-300
+                         hover:border-purple-400/50 hover:bg-purple-500/10
+                         hover:scale-110 hover:shadow-[0_0_20px_rgba(168,85,247,0.45)]
+                         float-slow"
             >
               <Icon className="h-5 w-5 text-white/80 transition-colors group-hover:text-purple-400" />
 
               {/* TOOLTIP */}
-              <span className="pointer-events-none absolute -top-10 scale-0 rounded bg-black px-2 py-1 text-xs text-white transition-all group-hover:scale-100">
+              <span className="pointer-events-none absolute -top-10 scale-0 rounded bg-black px-2 py-1 text-xs text-white transition-all duration-200 group-hover:scale-100">
                 {item.name}
               </span>
             </a>
