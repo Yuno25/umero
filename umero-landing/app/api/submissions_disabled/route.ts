@@ -8,12 +8,14 @@ export async function POST(req: Request) {
 
     // 🔴 LOG EVERYTHING
     const entries: Record<string, any> = {};
-    for (const [key, value] of formData.entries()) {
-      entries[key] =
-        typeof value === "object" && "name" in value
-          ? { fileName: (value as File).name }
-          : value;
-    }
+
+    formData.forEach((value, key) => {
+      if (value instanceof File) {
+        entries[key] = { fileName: value.name };
+      } else {
+        entries[key] = value;
+      }
+    });
 
     console.log("FORM DATA RECEIVED:", entries);
 
