@@ -8,14 +8,27 @@ export async function POST(req: Request) {
     await dbConnect();
     const formData = await req.formData();
 
-    const photo = formData.getAll("photo") as File;
+    // 🔹 TEXT FIELDS (SAFE)
+    const payload = {
+      name: formData.get("name")?.toString() || "",
+      email: formData.get("email")?.toString() || "",
+      city: formData.get("city")?.toString() || "",
+      propertyType: formData.get("propertyType")?.toString() || "",
+      contact: formData.get("contact")?.toString() || "",
+      address: formData.get("address")?.toString() || "",
+    };
 
-    let photoUrl = "";
+    // 🔹 MULTI PHOTO SAFE HANDLING
+    const files = formData.getAll("photos");
+    const uploadedPhotos: string[] = [];
 
-    if (photo && photo.size > 0) {
-      const buffer = Buffer.from(await photo.arrayBuffer());
+    for (const file of files) {
+      if (!(file instanceof File)) continue;
+      if (file.size === 0) continue;
 
-      const uploadResult = await new Promise<any>((resolve, reject) => {
+      const buffer = Buffer.from(await file.arrayBuffer());
+
+      const upload = await new Promise<any>((resolve, reject) => {
         cloudinary.uploader
           .upload_stream({ folder: "umero/listers" }, (err, result) => {
             if (err) reject(err);
@@ -24,21 +37,17 @@ export async function POST(req: Request) {
           .end(buffer);
       });
 
-      photoUrl = uploadResult.secure_url;
+      uploadedPhotos.push(upload.secure_url);
     }
 
     await Lister.create({
-      name: formData.get("name"),
-      email: formData.get("email"),
-      city: formData.get("city"),
-      propertyType: formData.get("propertyType"),
-      contact: formData.get("contact"),
-      photo: photoUrl,
+      ...payload,
+      photos: uploadedPhotos,
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Cloudinary Upload Error:", error);
+    console.error("LISTER API ERROR →", error);
     return NextResponse.json({ error: "Submission failed" }, { status: 500 });
   }
 }

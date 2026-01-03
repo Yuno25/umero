@@ -7,18 +7,15 @@ export default function EarlyAccessListerForm() {
   const router = useRouter();
   const formRef = useRef<HTMLDivElement>(null);
 
-  // ✅ store selected photos
   const [photos, setPhotos] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ handle file selection
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     setPhotos((prev) => [...prev, ...Array.from(e.target.files)]);
-    e.target.value = ""; // reset input
+    e.target.value = "";
   };
 
-  // ✅ remove selected photo
   const removePhoto = (index: number) => {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
   };
@@ -31,15 +28,14 @@ export default function EarlyAccessListerForm() {
 
     const inputs = formRef.current.querySelectorAll(
       "input:not([type='file']), textarea"
-    ) as NodeListOf<HTMLInputElement>;
+    ) as NodeListOf<HTMLInputElement | HTMLTextAreaElement>;
 
     inputs.forEach((input) => {
-      if (input.name && input.value) {
-        formData.append(input.name, input.value);
+      if (input.name && input.value.trim()) {
+        formData.append(input.name, input.value.trim());
       }
     });
 
-    // ✅ append photos properly
     photos.forEach((file) => {
       formData.append("photos", file);
     });
@@ -50,12 +46,12 @@ export default function EarlyAccessListerForm() {
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Failed");
+      if (!res.ok) throw new Error("Submission failed");
 
       router.push("/submission-success");
     } catch (err) {
-      alert("Submission failed. Please try again.");
       console.error(err);
+      alert("Submission failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -65,15 +61,25 @@ export default function EarlyAccessListerForm() {
     <div ref={formRef} className="glass p-8 rounded-2xl w-full max-w-lg">
       <h2 className="text-xl font-bold mb-4">Lister Early Access</h2>
 
-      <input name="name" placeholder="Name" className="input" />
-      <input name="email" placeholder="Email" className="input" />
-      <input name="city" placeholder="City" className="input" />
+      <input name="name" placeholder="Name" className="input" required />
+      <input name="email" placeholder="Email" className="input" required />
+      <input name="city" placeholder="City" className="input" required />
       <input
         name="propertyType"
         placeholder="Property Type"
         className="input"
+        required
       />
-      <input name="contact" placeholder="Contact" className="input" />
+      <input name="contact" placeholder="Contact" className="input" required />
+
+      {/* 🔥 REQUIRED FOR API */}
+      <textarea
+        name="address"
+        placeholder="Property Address"
+        className="input mt-3"
+        rows={3}
+        required
+      />
 
       {/* 📸 PHOTO UPLOAD */}
       <input

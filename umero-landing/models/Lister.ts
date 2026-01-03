@@ -1,15 +1,16 @@
-import mongoose, { Schema, models } from "mongoose";
+import mongoose from "mongoose";
 
-const ListerSchema = new Schema(
+const ListerSchema = new mongoose.Schema(
   {
     name: String,
     email: String,
     city: String,
     propertyType: String,
     contact: String,
+    address: String,
     photos: [String],
   },
   { timestamps: true }
 );
 
-export default models.Lister || mongoose.model("Lister", ListerSchema);
+export default mongoose.models.Lister || mongoose.model("Lister", ListerSchema);
