@@ -109,7 +109,6 @@ body {
   animation: floatSlow 6s ease-in-out infinite;
 }
 
-
 /*early acees
 
 */
@@ -130,8 +129,6 @@ body {
     transform: translateY(0);
   }
 }
-
-
 
 /*reach us */
 /* ===== Reach Us – Next Level Animations ===== */
@@ -172,4 +169,29 @@ body {
   100% {
     box-shadow: 0 0 0 rgba(168, 85, 247, 0);
   }
+}
+/* ===== NAV GLOW EFFECT ===== */
+.nav-glow {
+  position: relative;
+}
+
+.nav-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.6), 0 0 24px rgba(168, 85, 247, 0.4);
+}
+
+/* Desktop hover */
+.nav-glow:hover::after {
+  opacity: 1;
+}
+
+/* Mobile tap + keyboard */
+.nav-glow:active::after,
+.nav-glow:focus-visible::after {
+  opacity: 1;
 }
