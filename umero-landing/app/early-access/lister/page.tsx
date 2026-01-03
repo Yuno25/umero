@@ -1,163 +1,122 @@
 "use client";
+
 import { useRouter } from "next/navigation";
-import { useState, type ChangeEvent } from "react";
+import { useRef, useState } from "react";
 
-export default function ListerPage() {
+export default function EarlyAccessListerForm() {
   const router = useRouter();
+  const formRef = useRef<HTMLDivElement>(null);
 
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [contact, setContact] = useState<string>("");
+  // ✅ store selected photos
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const [propertyType, setPropertyType] = useState<string>("");
-  const [otherPropertyType, setOtherPropertyType] = useState<string>("");
+  // ✅ handle file selection
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setPhotos((prev) => [...prev, ...Array.from(e.target.files)]);
+    e.target.value = ""; // reset input
+  };
 
-  const [address, setAddress] = useState<string>("");
-  const [photos, setPhotos] = useState<FileList | null>(null);
+  // ✅ remove selected photo
+  const removePhoto = (index: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const finalPropertyType =
-      propertyType === "other" ? otherPropertyType : propertyType;
+  const handleSubmit = async () => {
+    if (!formRef.current) return;
+    setLoading(true);
 
     const formData = new FormData();
 
-    formData.append("type", "lister");
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("city", city);
-    formData.append("contact", contact);
-    formData.append("propertyType", finalPropertyType);
-    formData.append("address", address);
+    const inputs = formRef.current.querySelectorAll(
+      "input:not([type='file']), textarea"
+    ) as NodeListOf<HTMLInputElement>;
 
-    if (photos) {
-      Array.from(photos).forEach((file) => {
-        formData.append("photos", file);
-      });
-    }
-
-    const res = await fetch("/api/early-access/lister", {
-      method: "POST",
-      body: formData,
+    inputs.forEach((input) => {
+      if (input.name && input.value) {
+        formData.append(input.name, input.value);
+      }
     });
 
-    if (res.ok) {
-      const result = await res.json();
-      localStorage.setItem("submissionId", result.submissionId);
+    // ✅ append photos properly
+    photos.forEach((file) => {
+      formData.append("photos", file);
+    });
+
+    try {
+      const res = await fetch("/api/early-access/lister", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Failed");
+
       router.push("/submission-success");
-    } else {
-      alert("Submission failed");
+    } catch (err) {
+      alert("Submission failed. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-slate-900 px-4">
-      <div className="w-full max-w-2xl bg-slate-950 text-white rounded-2xl shadow-xl p-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">
-            Property Owner – Early Access
-          </h1>
-          <p className="text-slate-400">
-            List your property early and be among the first to host on Umero
-          </p>
+    <div ref={formRef} className="glass p-8 rounded-2xl w-full max-w-lg">
+      <h2 className="text-xl font-bold mb-4">Lister Early Access</h2>
+
+      <input name="name" placeholder="Name" className="input" />
+      <input name="email" placeholder="Email" className="input" />
+      <input name="city" placeholder="City" className="input" />
+      <input
+        name="propertyType"
+        placeholder="Property Type"
+        className="input"
+      />
+      <input name="contact" placeholder="Contact" className="input" />
+
+      {/* 📸 PHOTO UPLOAD */}
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handlePhotoChange}
+        className="input mt-3"
+      />
+
+      {/* 🖼️ PHOTO PREVIEW + DELETE */}
+      {photos.length > 0 && (
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          {photos.map((photo, index) => (
+            <div
+              key={index}
+              className="relative rounded-xl overflow-hidden border border-white/10"
+            >
+              <img
+                src={URL.createObjectURL(photo)}
+                alt="preview"
+                className="h-24 w-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => removePhoto(index)}
+                className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-6 h-6 text-xs"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
         </div>
+      )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Full Name"
-            required
-            className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:border-indigo-500"
-          />
-
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email Address"
-            required
-            className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:border-indigo-500"
-          />
-
-          <input
-            type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="City"
-            required
-            className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:border-indigo-500"
-          />
-
-          <input
-            type="tel"
-            value={contact}
-            onChange={(e) => setContact(e.target.value)}
-            placeholder="Contact Number"
-            required
-            className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:border-indigo-500"
-          />
-
-          {/* Property Type */}
-          <select
-            value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value)}
-            required
-            className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:border-indigo-500"
-          >
-            <option value="" disabled>
-              Select Space Type
-            </option>
-            <option value="Apartment">Apartment</option>
-            <option value="Villa">Villa</option>
-            <option value="PG / Shared">PG / Shared</option>
-            <option value="Independent House">Independent House</option>
-            <option value="other">Other</option>
-          </select>
-
-          {/* Show only if Other selected */}
-          {propertyType === "other" && (
-            <input
-              type="text"
-              value={otherPropertyType}
-              onChange={(e) => setOtherPropertyType(e.target.value)}
-              placeholder="Specify property type (Shop, Open Plot, Warehouse...)"
-              required
-              className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-indigo-500 focus:outline-none"
-            />
-          )}
-
-          <textarea
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Property Address"
-            rows={3}
-            required
-            className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:border-indigo-500 resize-none"
-          />
-
-          <div>
-            <label className="block text-sm text-slate-400 mb-2">
-              Upload Property Photos
-            </label>
-            <input
-              type="file"
-              multiple
-              onChange={(e) => setPhotos(e.target.files)}
-              className="w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"
-            />
-          </div>
-
-          <button type="submit" className="btn-primary w-full">
-            Submit
-          </button>
-        </form>
-      </div>
+      <button
+        type="button"
+        disabled={loading}
+        onClick={handleSubmit}
+        className="btn-primary w-full mt-4"
+      >
+        {loading ? "Submitting..." : "Submit"}
+      </button>
     </div>
   );
 }

@@ -1,47 +1,44 @@
-import { connectDB } from "../../../../lib/db";
-import Lister from "../../../../models/Lister";
-import { writeFile } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
+import { NextResponse } from "next/server";
+import cloudinary from "@/lib/cloudinary";
+import dbConnect from "@/lib/db";
+import Lister from "@/models/Lister";
 
 export async function POST(req: Request) {
   try {
-    await connectDB();
-
+    await dbConnect();
     const formData = await req.formData();
 
-    const uploadDir = path.join(process.cwd(), "public/uploads/listers");
+    const photo = formData.getAll("photo") as File;
 
-    const photos = formData.getAll("photos") as File[];
-    const savedPhotos: string[] = [];
+    let photoUrl = "";
 
-    for (const photo of photos) {
-      const bytes = await photo.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+    if (photo && photo.size > 0) {
+      const buffer = Buffer.from(await photo.arrayBuffer());
 
-      const ext = photo.name.split(".").pop();
-      const fileName = `${randomUUID()}.${ext}`;
+      const uploadResult = await new Promise<any>((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ folder: "umero/listers" }, (err, result) => {
+            if (err) reject(err);
+            resolve(result);
+          })
+          .end(buffer);
+      });
 
-      const filePath = path.join(uploadDir, fileName);
-      await writeFile(filePath, buffer);
-
-      savedPhotos.push(`/uploads/listers/${fileName}`);
+      photoUrl = uploadResult.secure_url;
     }
 
-    const data = {
+    await Lister.create({
       name: formData.get("name"),
       email: formData.get("email"),
       city: formData.get("city"),
       propertyType: formData.get("propertyType"),
       contact: formData.get("contact"),
-      photos: savedPhotos,
-    };
+      photo: photoUrl,
+    });
 
-    await Lister.create(data);
-
-    return new Response(JSON.stringify({ success: true }), { status: 201 });
-  } catch (err) {
-    console.error("LISTER UPLOAD ERROR:", err);
-    return new Response("error", { status: 500 });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Cloudinary Upload Error:", error);
+    return NextResponse.json({ error: "Submission failed" }, { status: 500 });
   }
 }
