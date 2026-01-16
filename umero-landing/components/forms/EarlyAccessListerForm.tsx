@@ -1,7 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+
+type PreviewPhoto = {
+  file: File;
+  preview: string;
+};
 
 export default function EarlyAccessListerForm() {
   const router = useRouter();
@@ -16,31 +21,83 @@ export default function EarlyAccessListerForm() {
   const [propertyType, setPropertyType] = useState("");
   const [otherProperty, setOtherProperty] = useState("");
 
-  const [photos, setPhotos] = useState<File[]>([]);
+  /* ================= PRICING ================= */
+  const [pricingType, setPricingType] = useState<
+    "" | "hourly" | "daily" | "monthly"
+  >("");
+
+  const [hourlyDetails, setHourlyDetails] = useState({
+    pricePerHour: "",
+    minHours: "",
+    openFromHour: 9,
+    openFromPeriod: "AM" as "AM" | "PM",
+    openToHour: 6,
+    openToPeriod: "PM" as "AM" | "PM",
+  });
+
+  /* ================= PHOTOS ================= */
+  const [photos, setPhotos] = useState<PreviewPhoto[]>([]);
   const [loading, setLoading] = useState(false);
 
-  /* ================= PHOTO HANDLERS ================= */
+  const residentialTypes = [
+    "Apartment",
+    "Villa",
+    "Independent House",
+    "PG / Shared",
+  ];
 
+  /* ================= HELPERS ================= */
+  const formatTime = (hour: number, period: "AM" | "PM") => {
+    let h = hour % 12;
+    if (h === 0) h = 12;
+    return `${h}:00 ${period}`;
+  };
+
+  /* ================= PHOTO HANDLERS ================= */
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
-    const selectedFiles = Array.from(e.target.files);
-    console.log("Selected photos:", selectedFiles); // 🔍 debug
+    const newPhotos: PreviewPhoto[] = Array.from(e.target.files).map(
+      (file) => ({
+        file,
+        preview: URL.createObjectURL(file),
+      })
+    );
 
-    setPhotos((prev) => [...prev, ...selectedFiles]);
+    setPhotos((prev) => [...prev, ...newPhotos]);
     e.target.value = "";
   };
 
   const removePhoto = (index: number) => {
-    setPhotos((prev) => prev.filter((_, i) => i !== index));
+    setPhotos((prev) => {
+      URL.revokeObjectURL(prev[index].preview);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
-  /* ================= SUBMIT ================= */
+  useEffect(() => {
+    return () => {
+      photos.forEach((p) => URL.revokeObjectURL(p.preview));
+    };
+  }, [photos]);
 
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ✅ SAFETY CHECK (prevents empty uploads)
+    if (!pricingType) {
+      alert("Please select how you want to rent the space");
+      return;
+    }
+
+    if (
+      pricingType === "hourly" &&
+      (!hourlyDetails.pricePerHour || !hourlyDetails.minHours)
+    ) {
+      alert("Please fill hourly pricing details");
+      return;
+    }
+
     if (photos.length === 0) {
       alert("Please upload at least one photo");
       return;
@@ -52,15 +109,27 @@ export default function EarlyAccessListerForm() {
     fd.append("name", name);
     fd.append("email", email);
     fd.append("city", city);
+    fd.append("contact", contact);
     fd.append(
       "propertyType",
       propertyType === "Other" ? otherProperty : propertyType
     );
-    fd.append("contact", contact);
+    fd.append("pricingType", pricingType);
 
-    photos.forEach((file) => {
-      fd.append("photos", file);
-    });
+    if (pricingType === "hourly") {
+      fd.append("pricePerHour", hourlyDetails.pricePerHour);
+      fd.append("minHours", hourlyDetails.minHours);
+      fd.append(
+        "openFrom",
+        formatTime(hourlyDetails.openFromHour, hourlyDetails.openFromPeriod)
+      );
+      fd.append(
+        "openTo",
+        formatTime(hourlyDetails.openToHour, hourlyDetails.openToPeriod)
+      );
+    }
+
+    photos.forEach(({ file }) => fd.append("photos", file));
 
     const res = await fetch("/api/early-access/lister", {
       method: "POST",
@@ -74,7 +143,6 @@ export default function EarlyAccessListerForm() {
   };
 
   /* ================= UI ================= */
-
   return (
     <div
       ref={formRef}
@@ -89,119 +157,186 @@ export default function EarlyAccessListerForm() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
+          className="input"
           placeholder="Full Name"
-          className="input focus:ring-2 focus:ring-purple-500/40"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
         />
-
         <input
+          className="input"
           type="email"
           placeholder="Email Address"
-          className="input focus:ring-2 focus:ring-purple-500/40"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
         />
-
         <input
+          className="input"
           placeholder="City"
-          className="input focus:ring-2 focus:ring-purple-500/40"
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          required
         />
-
         <input
+          className="input"
           placeholder="Contact Number"
-          className="input focus:ring-2 focus:ring-purple-500/40"
           value={contact}
           onChange={(e) => setContact(e.target.value)}
-          required
         />
 
-        {/* PROPERTY TYPE */}
         <select
           value={propertyType}
           onChange={(e) => setPropertyType(e.target.value)}
-          className="input bg-[#0b1220] text-white 
-                     focus:ring-2 focus:ring-purple-500/40
-                     [&>option]:bg-[#0b1220] [&>option]:text-white"
-          required
+          className="input bg-black/40 text-white border border-white/10 
+             focus:ring-2 focus:ring-purple-500
+             [&>option]:bg-[#0b1220] [&>option]:text-white"
         >
           <option value="">Select Property Type</option>
-          <option value="Apartment">Apartment</option>
-          <option value="Villa">Villa</option>
-          <option value="PG / Shared">PG / Shared</option>
-          <option value="Independent House">Independent House</option>
+          <option>Apartment</option>
+          <option>Villa</option>
+          <option>PG / Shared</option>
+          <option>Independent House</option>
           <option value="Other">Other (Shop / Ground / Workshop)</option>
         </select>
 
         {propertyType === "Other" && (
           <input
+            className="input"
             placeholder="Specify property type"
-            className="input focus:ring-2 focus:ring-purple-500/40"
             value={otherProperty}
             onChange={(e) => setOtherProperty(e.target.value)}
-            required
           />
         )}
 
-        {/* PHOTO UPLOAD */}
-        <div className="mt-2">
-          <p className="text-xs text-white/60 mb-2">Upload Property Photos</p>
+        {/* ===== PRICING TYPE ===== */}
+        <div className="flex gap-3">
+          {["hourly", "daily", "monthly"].map((type) => {
+            const hourlyDisabled =
+              type === "hourly" && residentialTypes.includes(propertyType);
 
-          {/* 🔥 FIX: name="photos" */}
-          <input
-            type="file"
-            id="photoUpload"
-            name="photos" // ✅ REQUIRED
-            accept="image/*"
-            multiple
-            onChange={handlePhotoChange}
-            className="hidden"
-          />
-
-          <label
-            htmlFor="photoUpload"
-            className="
-              flex items-center justify-center
-              cursor-pointer rounded-xl px-4 py-3
-              bg-purple-600 hover:bg-purple-700
-              text-white font-medium
-              shadow-lg shadow-purple-600/30
-              transition-all
-            "
-          >
-            Choose Photos
-          </label>
-
-          {photos.length > 0 && (
-            <p className="text-xs text-purple-400 mt-2">
-              {photos.length} photo{photos.length > 1 ? "s" : ""} selected
-            </p>
-          )}
+            return (
+              <button
+                key={type}
+                type="button"
+                disabled={hourlyDisabled}
+                onClick={() => setPricingType(type as any)}
+                className={`px-4 py-2 rounded-xl text-sm capitalize
+                  ${
+                    pricingType === type
+                      ? "bg-purple-500/20 border border-purple-400 text-white"
+                      : "bg-white/5 border border-white/10 text-white/60"
+                  }
+                  ${hourlyDisabled ? "opacity-40 cursor-not-allowed" : ""}
+                `}
+              >
+                {type}
+              </button>
+            );
+          })}
         </div>
 
-        {/* PHOTO PREVIEW */}
+        {/* ===== HOURLY UI WITH TIME SLOTS ===== */}
+        {pricingType === "hourly" && (
+          <div className="mt-3 p-5 rounded-2xl border border-white/10 bg-black/30 space-y-4">
+            <input
+              className="input"
+              placeholder="Price per hour (₹)"
+              type="number"
+              value={hourlyDetails.pricePerHour}
+              onChange={(e) =>
+                setHourlyDetails({
+                  ...hourlyDetails,
+                  pricePerHour: e.target.value,
+                })
+              }
+            />
+            <input
+              className="input"
+              placeholder="Minimum booking hours"
+              type="number"
+              value={hourlyDetails.minHours}
+              onChange={(e) =>
+                setHourlyDetails({ ...hourlyDetails, minHours: e.target.value })
+              }
+            />
+
+            {[
+              { label: "From", hour: "openFromHour", period: "openFromPeriod" },
+              { label: "To", hour: "openToHour", period: "openToPeriod" },
+            ].map(({ label, hour, period }) => (
+              <div key={label} className="flex items-center gap-3">
+                <span className="text-white/70 w-12 text-sm">{label}</span>
+                <select
+                  className="bg-black/40 text-white px-3 py-2 rounded-lg border border-white/10"
+                  value={(hourlyDetails as any)[hour]}
+                  onChange={(e) =>
+                    setHourlyDetails((prev) => ({
+                      ...prev,
+                      [hour]: Number(e.target.value),
+                    }))
+                  }
+                >
+                  {[...Array(12)].map((_, i) => (
+                    <option key={i} value={i + 1}>
+                      {i + 1}
+                    </option>
+                  ))}
+                </select>
+
+                {["AM", "PM"].map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() =>
+                      setHourlyDetails((prev) => ({
+                        ...prev,
+                        [period]: p,
+                      }))
+                    }
+                    className={`px-3 py-2 text-xs rounded-lg border
+                      ${
+                        (hourlyDetails as any)[period] === p
+                          ? "bg-purple-500/30 border-purple-400 text-white"
+                          : "bg-white/5 border-white/10 text-white/60"
+                      }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ===== PHOTOS ===== */}
+        <input
+          type="file"
+          id="photoUpload"
+          multiple
+          accept="image/*"
+          onChange={handlePhotoChange}
+          className="hidden"
+        />
+
+        <label
+          htmlFor="photoUpload"
+          className="btn-primary w-full text-center cursor-pointer"
+        >
+          {photos.length > 0
+            ? `Choose Photos (${photos.length} selected)`
+            : "Choose Photos"}
+        </label>
+
         {photos.length > 0 && (
-          <div className="grid grid-cols-3 gap-3 mt-4">
+          <div className="grid grid-cols-3 gap-3 mt-3">
             {photos.map((photo, index) => (
-              <div
-                key={index}
-                className="relative rounded-xl overflow-hidden border border-white/10"
-              >
+              <div key={index} className="relative">
                 <img
-                  src={URL.createObjectURL(photo)}
-                  alt="preview"
-                  className="h-24 w-full object-cover"
+                  src={photo.preview}
+                  className="h-24 w-full object-cover rounded-xl"
                 />
                 <button
                   type="button"
                   onClick={() => removePhoto(index)}
-                  className="absolute top-1 right-1 bg-black/70 text-white
-                             rounded-full w-6 h-6 text-xs flex items-center justify-center"
+                  className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-6 h-6 text-xs"
                 >
                   ✕
                 </button>
@@ -212,8 +347,8 @@ export default function EarlyAccessListerForm() {
 
         <button
           type="submit"
-          disabled={loading}
-          className="btn-primary w-full mt-4 disabled:opacity-60"
+          disabled={loading || photos.length === 0}
+          className="btn-primary w-full mt-4 disabled:opacity-50 disabled:pointer-events-none"
         >
           {loading ? "Submitting..." : "Submit"}
         </button>
