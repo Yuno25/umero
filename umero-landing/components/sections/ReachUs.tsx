@@ -4,10 +4,26 @@ import { useEffect, useRef } from "react";
 import { Mail, Linkedin, Instagram, X } from "lucide-react";
 
 const socialLinks = [
-  { name: "LinkedIn", href: "https://linkedin.com", icon: Linkedin },
-  { name: "Instagram", href: "https://instagram.com", icon: Instagram },
-  { name: "X", href: "https://x.com", icon: X },
-  { name: "Email", href: "mailto:contact@umero.in", icon: Mail },
+  {
+    name: "LinkedIn",
+    href: "https://www.linkedin.com/company/umero/posts/?feedView=all",
+    icon: Linkedin,
+  },
+  {
+    name: "Instagram",
+    href: "https://instagram.com/umero.in/",
+    icon: Instagram,
+  },
+  {
+    name: "X",
+    href: "https://x.com/umero", // change if you have a different handle
+    icon: X,
+  },
+  {
+    name: "Email",
+    href: "mailto:contact@umero.in?subject=Hello%20Umero&body=Hi%20Umero%20Team,",
+    icon: Mail,
+  },
 ];
 
 export default function ReachUs() {
@@ -20,7 +36,7 @@ export default function ReachUs() {
           entry.target.classList.add("opacity-100", "translate-y-0");
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.2 },
     );
 
     if (containerRef.current) observer.observe(containerRef.current);
