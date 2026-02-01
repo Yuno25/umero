@@ -6,7 +6,6 @@ interface WelcomeCardProps {
   type: "signup" | "login";
   showAfterLoad: boolean;
 }
-
 export default function WelcomeCard({ type, showAfterLoad }: WelcomeCardProps) {
   const [visible, setVisible] = useState(false);
 
