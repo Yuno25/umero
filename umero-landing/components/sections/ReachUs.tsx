@@ -16,7 +16,7 @@ const socialLinks = [
   },
   {
     name: "X",
-    href: "https://x.com/umero", // change if you have a different handle
+    href: "https://x.com/umero",
     icon: X,
   },
   {

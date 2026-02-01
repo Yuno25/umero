@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import ClientShell from "@/components/ClientShell";
 
 export const metadata: Metadata = {
   title: "Umero | Urban Rental Platform",
@@ -21,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-bgLight text-textDark dark:bg-dark dark:text-white">
-        {children}
+        <ClientShell>{children}</ClientShell>
       </body>
     </html>
   );
