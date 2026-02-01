@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import WelcomeCard from "@/components/Welcomecard";
+import WelcomeCard from "@/components/WelcomeCard";
 
 export default function HomeClient() {
   const [homeReady, setHomeReady] = useState(false);
