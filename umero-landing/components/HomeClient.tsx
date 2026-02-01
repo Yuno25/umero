@@ -27,7 +27,7 @@ export default function HomeClient() {
   return (
     <>
       {homeReady && lastAuthAction && (
-        <WelcomeCard type={lastAuthAction} showAfterLoad={homeReady} />
+        <Welcomecard type={lastAuthAction} showAfterLoad={homeReady} />
       )}
     </>
   );

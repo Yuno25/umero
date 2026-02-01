@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-interface WelcomeCardProps {
+interface WelcomecardProps {
   type: "signup" | "login";
   showAfterLoad: boolean;
 }
-export default function WelcomeCard({ type, showAfterLoad }: WelcomeCardProps) {
+export default function Welcomecard({ type, showAfterLoad }: WelcomeCardProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
