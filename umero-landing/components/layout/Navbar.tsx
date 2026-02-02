@@ -3,15 +3,33 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
+
+/* ACTIVITIES LIST */
+const ACTIVITIES = [
+  "birthday",
+  "party",
+  "photography",
+  "videography",
+  "podcast",
+];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const router = useRouter();
+
+  const handleSelectActivity = (activity: string) => {
+    router.push(`/spaces?activity=${activity}`);
+    setShowDropdown(false);
+    setMobileOpen(false);
+  };
 
   return (
     <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
       <div className="flex items-center gap-6">
-        {/* LOGO — OUTSIDE GLASS */}
+        {/* LOGO */}
         <Link
           href="/"
           className="flex items-center gap-2 text-white font-bold text-lg tracking-wide shrink-0"
@@ -27,9 +45,9 @@ export default function Navbar() {
         </Link>
 
         {/* GLASS NAVBAR */}
-        <div className="flex-1 glass rounded-2xl px-6 py-3 flex items-center justify-between">
-          {/* SEARCH BAR — DESKTOP ONLY */}
-          <div className="hidden md:flex items-center gap-2 glass px-4 py-2 rounded-xl w-[280px]">
+        <div className="flex-1 glass rounded-2xl px-6 py-3 flex items-center justify-between relative">
+          {/* SEARCH — DESKTOP */}
+          <div className="relative hidden md:flex items-center gap-2 glass px-4 py-2 rounded-xl w-[280px]">
             <svg
               className="w-4 h-4 text-gray-300"
               fill="none"
@@ -43,11 +61,29 @@ export default function Navbar() {
                 d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
+
             <input
               type="text"
-              placeholder="Search spaces, cities..."
-              className="bg-transparent outline-none text-sm text-white placeholder-gray-400 w-full"
+              placeholder="Search activities"
+              readOnly
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="bg-transparent outline-none text-sm text-white placeholder-gray-400 w-full cursor-pointer"
             />
+
+            {/* DROPDOWN */}
+            {showDropdown && (
+              <div className="absolute top-full left-0 mt-2 w-full bg-white text-black rounded-xl shadow-lg z-50 overflow-hidden">
+                {ACTIVITIES.map((activity) => (
+                  <button
+                    key={activity}
+                    onClick={() => handleSelectActivity(activity)}
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 capitalize"
+                  >
+                    {activity}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* NAV LINKS — DESKTOP */}
@@ -69,9 +105,25 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* MOBILE DROPDOWN MENU */}
+      {/* MOBILE MENU */}
       {mobileOpen && (
-        <div className="md:hidden mt-3 glass rounded-2xl px-6 py-4">
+        <div className="md:hidden mt-3 glass rounded-2xl px-6 py-4 space-y-4">
+          {/* MOBILE ACTIVITY LIST */}
+          <div className="flex flex-col gap-2">
+            <p className="text-xs text-gray-400 uppercase tracking-wide">
+              Search activities
+            </p>
+            {ACTIVITIES.map((activity) => (
+              <button
+                key={activity}
+                onClick={() => handleSelectActivity(activity)}
+                className="text-left text-white text-sm px-3 py-2 rounded-lg hover:bg-white/10 capitalize"
+              >
+                {activity}
+              </button>
+            ))}
+          </div>
+
           <nav className="flex flex-col gap-4 text-sm font-bold text-gray-200">
             <NavItem href="/" onClick={() => setMobileOpen(false)}>
               Home
@@ -92,7 +144,7 @@ export default function Navbar() {
   );
 }
 
-/* GLOW-ENABLED NAV ITEM */
+/* NAV ITEM */
 function NavItem({
   href,
   children,
@@ -106,13 +158,7 @@ function NavItem({
     <Link
       href={href}
       onClick={onClick}
-      className="
-        nav-glow
-        relative px-4 py-2 rounded-lg
-        transition-all duration-300
-        text-white/90
-        focus:outline-none
-      "
+      className="nav-glow relative px-4 py-2 rounded-lg transition-all duration-300 text-white/90"
     >
       {children}
     </Link>
