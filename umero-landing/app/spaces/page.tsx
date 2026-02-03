@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useSearchParams } from "next/navigation";
 
 const DUMMY_SPACES = [
@@ -93,21 +95,18 @@ export default function SpacesPage() {
               key={space.id}
               className="border rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-md transition"
             >
-              {/* IMAGE */}
               <img
                 src={space.images[0]}
                 alt={space.name}
                 className="h-56 w-full object-cover"
               />
 
-              {/* CONTENT */}
               <div className="p-5">
                 <h2 className="text-xl font-semibold text-black mb-1">
                   {space.name}
                 </h2>
                 <p className="text-sm text-gray-500 mb-3">{space.city}</p>
 
-                {/* TAGS */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   {space.activities.map((act) => (
                     <span
@@ -119,7 +118,6 @@ export default function SpacesPage() {
                   ))}
                 </div>
 
-                {/* FOOTER */}
                 <div className="flex items-center justify-between">
                   <span className="text-lg font-semibold text-black">
                     ₹{space.price}/hour
