@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
@@ -19,6 +19,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
+  const mobileRef = useRef<HTMLDivElement>(null);
 
   const handleSelectActivity = (activity: string) => {
     router.push(`/spaces?activity=${activity}`);
@@ -26,13 +27,42 @@ export default function Navbar() {
     setMobileOpen(false);
   };
 
+  /* CLOSE MOBILE MENU ON OUTSIDE CLICK */
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        mobileRef.current &&
+        !mobileRef.current.contains(event.target as Node)
+      ) {
+        setMobileOpen(false);
+      }
+    }
+
+    if (mobileOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [mobileOpen]);
+
   return (
-    <header className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-      <div className="flex items-center gap-6">
-        {/* LOGO */}
+    <header className="fixed top-0 left-0 w-full z-50 px-4 md:top-6 md:left-1/2 md:-translate-x-1/2 md:max-w-7xl">
+      <div className="relative flex items-center justify-between h-16 md:h-auto">
+        {/* MOBILE MENU BUTTON - LEFT */}
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="md:hidden text-white p-2"
+          aria-label="Toggle menu"
+        >
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+
+        {/* LOGO - CENTERED ON MOBILE */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-white font-bold text-lg tracking-wide shrink-0"
+          className="flex items-center gap-2 text-white font-bold text-lg tracking-wide absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0"
         >
           <Image
             src="/logo/UMERO-new-logo.svg"
@@ -44,10 +74,10 @@ export default function Navbar() {
           <span>UMERO</span>
         </Link>
 
-        {/* GLASS NAVBAR */}
-        <div className="flex-1 glass rounded-2xl px-6 py-3 flex items-center justify-between relative">
+        {/* DESKTOP GLASS NAVBAR */}
+        <div className="hidden md:flex flex-1 glass rounded-2xl px-6 py-3 items-center justify-between relative">
           {/* SEARCH — DESKTOP */}
-          <div className="relative hidden md:flex items-center gap-2 glass px-4 py-2 rounded-xl w-[280px]">
+          <div className="relative flex items-center gap-2 glass px-4 py-2 rounded-xl w-[280px]">
             <svg
               className="w-4 h-4 text-gray-300"
               fill="none"
@@ -70,7 +100,6 @@ export default function Navbar() {
               className="bg-transparent outline-none text-sm text-white placeholder-gray-400 w-full cursor-pointer"
             />
 
-            {/* DROPDOWN */}
             {showDropdown && (
               <div className="absolute top-full left-0 mt-2 w-full bg-white text-black rounded-xl shadow-lg z-50 overflow-hidden">
                 {ACTIVITIES.map((activity) => (
@@ -87,27 +116,21 @@ export default function Navbar() {
           </div>
 
           {/* NAV LINKS — DESKTOP */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-bold text-gray-200">
+          <nav className="flex items-center gap-6 text-sm font-bold text-gray-200">
             <NavItem href="/">Home</NavItem>
             <NavItem href="/#about">About</NavItem>
             <NavItem href="/early-access">Early Access</NavItem>
             <NavItem href="#reach-us">Reach Us</NavItem>
           </nav>
-
-          {/* MOBILE MENU BUTTON */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-white nav-glow p-2 rounded-lg"
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
         </div>
       </div>
 
       {/* MOBILE MENU */}
       {mobileOpen && (
-        <div className="md:hidden mt-3 glass rounded-2xl px-6 py-4 space-y-4">
+        <div
+          ref={mobileRef}
+          className="md:hidden mt-3 glass rounded-2xl px-6 py-4 space-y-4"
+        >
           {/* MOBILE ACTIVITY LIST */}
           <div className="flex flex-col gap-2">
             <p className="text-xs text-gray-400 uppercase tracking-wide">
