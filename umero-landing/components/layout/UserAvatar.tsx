@@ -5,6 +5,11 @@ import { useAuth } from "@/lib/useAuth";
 export default function UserAvatar({ onClick }: { onClick: () => void }) {
   const { user } = useAuth();
 
+  const firstLetter =
+    user?.name?.charAt(0)?.toUpperCase() ||
+    user?.email?.charAt(0)?.toUpperCase() ||
+    "G";
+
   return (
     <button
       onClick={onClick}
@@ -19,7 +24,7 @@ export default function UserAvatar({ onClick }: { onClick: () => void }) {
       "
       aria-label="User menu"
     >
-      {user ? user.email[0].toUpperCase() : "G"}
+      {firstLetter}
     </button>
   );
 }

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import SideDrawer from "./SideDrawer";
+import UserAvatar from "./UserAvatar";
 
 /* ACTIVITIES LIST */
 const ACTIVITIES = [
@@ -18,6 +20,8 @@ const ACTIVITIES = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false); // ✅ FIXED: moved inside component
+
   const router = useRouter();
   const mobileRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +63,7 @@ export default function Navbar() {
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
 
-        {/* LOGO - CENTERED ON MOBILE */}
+        {/* LOGO */}
         <Link
           href="/"
           className="flex items-center gap-2 text-white font-bold text-lg tracking-wide absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0"
@@ -76,7 +80,7 @@ export default function Navbar() {
 
         {/* DESKTOP GLASS NAVBAR */}
         <div className="hidden md:flex flex-1 glass rounded-2xl px-6 py-3 items-center justify-between relative">
-          {/* SEARCH — DESKTOP */}
+          {/* SEARCH */}
           <div className="relative flex items-center gap-2 glass px-4 py-2 rounded-xl w-[280px]">
             <svg
               className="w-4 h-4 text-gray-300"
@@ -115,7 +119,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* NAV LINKS — DESKTOP */}
+          {/* NAV LINKS */}
           <nav className="flex items-center gap-6 text-sm font-bold text-gray-200">
             <NavItem href="/">Home</NavItem>
             <NavItem href="/#about">About</NavItem>
@@ -131,7 +135,6 @@ export default function Navbar() {
           ref={mobileRef}
           className="md:hidden mt-3 glass rounded-2xl px-6 py-4 space-y-4"
         >
-          {/* MOBILE ACTIVITY LIST */}
           <div className="flex flex-col gap-2">
             <p className="text-xs text-gray-400 uppercase tracking-wide">
               Search activities

@@ -10,7 +10,7 @@ export async function GET() {
 
     const cookieStore = cookies();
 
-    // 🔐 Support both old & new cookie names (safe)
+    // Support both old & new cookie names (safe)
     const token =
       cookieStore.get("umero_token")?.value || cookieStore.get("token")?.value;
 
@@ -24,7 +24,7 @@ export async function GET() {
 
     // 🔍 Fetch fresh user data
     const user = await User.findById(decoded.userId).select(
-      "email lastAuthAction",
+      "name email lastAuthAction",
     );
 
     if (!user) {
@@ -34,6 +34,7 @@ export async function GET() {
     return NextResponse.json({
       user: {
         id: user._id,
+        name: user.name,
         email: user.email,
         lastAuthAction: user.lastAuthAction,
       },

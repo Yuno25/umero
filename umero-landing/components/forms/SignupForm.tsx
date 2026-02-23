@@ -32,7 +32,7 @@ export default function SignupForm() {
   const handleSubmit = async () => {
     setError("");
 
-    // 🔒 BASIC VALIDATION
+    // BASIC VALIDATION
     if (
       !form.username ||
       !form.email ||
