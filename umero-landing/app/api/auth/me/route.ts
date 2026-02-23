@@ -22,9 +22,9 @@ export async function GET() {
       userId: string;
     };
 
-    // 🔍 Fetch fresh user data
+    //  Fetch fresh user data
     const user = await User.findById(decoded.userId).select(
-      "name email lastAuthAction",
+      "username email lastAuthAction",
     );
 
     if (!user) {
@@ -34,7 +34,7 @@ export async function GET() {
     return NextResponse.json({
       user: {
         id: user._id,
-        name: user.name,
+        username: user.username,
         email: user.email,
         lastAuthAction: user.lastAuthAction,
       },

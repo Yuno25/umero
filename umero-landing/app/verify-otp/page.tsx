@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { useAuth } from "@/lib/useAuth";
 export default function VerifyOTPPage() {
   const router = useRouter();
+  const { refreshAuth } = useAuth();
 
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
@@ -102,8 +103,8 @@ export default function VerifyOTPPage() {
     localStorage.removeItem("pending_email");
 
     //  REDIRECT
+    await refreshAuth(); // Refresh auth state to get the new user data
     router.push("/");
-    router.refresh();
   };
 
   // Prevent flicker before ready

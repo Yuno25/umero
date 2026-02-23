@@ -6,7 +6,7 @@ export default function UserAvatar({ onClick }: { onClick: () => void }) {
   const { user } = useAuth();
 
   const firstLetter =
-    user?.name?.charAt(0)?.toUpperCase() ||
+    user?.username?.charAt(0)?.toUpperCase() ||
     user?.email?.charAt(0)?.toUpperCase() ||
     "G";
 

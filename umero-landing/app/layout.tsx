@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import ClientShell from "@/components/ClientShell";
-
+import { AuthProvider } from "@/lib/useAuth";
 export const metadata: Metadata = {
   title: "Umero | Urban Rental Platform",
   description: "Premium peer-to-peer urban rental platform",
@@ -22,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-bgLight text-textDark dark:bg-dark dark:text-white">
-        <ClientShell>{children}</ClientShell>
+        <AuthProvider>
+          <ClientShell>{children}</ClientShell>
+        </AuthProvider>
       </body>
     </html>
   );

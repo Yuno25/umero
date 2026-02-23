@@ -13,7 +13,7 @@ export default function SideDrawer({
 }) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { user } = useAuth(); // ✅ get logged-in user
+  const { user, refreshAuth } = useAuth(); // ✅ get logged-in user
   const [propertyOpen, setPropertyOpen] = useState(false);
 
   useEffect(() => {
@@ -39,7 +39,8 @@ export default function SideDrawer({
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.refresh();
+    await refreshAuth(); // Refresh auth state to clear user data
+    router.push("/");
     onClose();
   };
 
@@ -70,7 +71,7 @@ export default function SideDrawer({
               {/* User Info */}
               <div className="mb-8">
                 <div className="text-lg font-semibold">
-                  {user.name || user.email}
+                  {user.username || user.email}
                 </div>
                 <div className="text-sm text-white/60">{user.email}</div>
               </div>
