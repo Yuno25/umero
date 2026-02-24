@@ -4,6 +4,7 @@ import { useState } from "react";
 import Navbar from "./layout/Navbar";
 import SideDrawer from "./layout/SideDrawer";
 import UserAvatar from "./layout/UserAvatar";
+import useScrollReveal from "hooks/useScrollReveal";
 
 export default function ClientShell({
   children,
@@ -11,6 +12,9 @@ export default function ClientShell({
   children: React.ReactNode;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Global scroll reveal activation
+  useScrollReveal();
 
   return (
     <>

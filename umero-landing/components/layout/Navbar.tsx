@@ -8,7 +8,6 @@ import { Menu, X } from "lucide-react";
 import SideDrawer from "./SideDrawer";
 import UserAvatar from "./UserAvatar";
 
-/* ACTIVITIES LIST */
 const ACTIVITIES = [
   "birthday",
   "party",
@@ -20,7 +19,7 @@ const ACTIVITIES = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false); // ✅ FIXED: moved inside component
+  const [scrolled, setScrolled] = useState(false);
 
   const router = useRouter();
   const mobileRef = useRef<HTMLDivElement>(null);
@@ -31,7 +30,15 @@ export default function Navbar() {
     setMobileOpen(false);
   };
 
-  /* CLOSE MOBILE MENU ON OUTSIDE CLICK */
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -54,19 +61,19 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 left-0 w-full z-50 px-4 md:top-6 md:left-1/2 md:-translate-x-1/2 md:max-w-7xl">
       <div className="relative flex items-center justify-between h-16 md:h-auto">
-        {/* MOBILE MENU BUTTON - LEFT */}
+        {/* MOBILE MENU BUTTON */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden text-white p-2"
+          className="md:hidden text-white p-2 transition-all duration-200 hover:scale-110 active:scale-95"
           aria-label="Toggle menu"
         >
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
 
-        {/* LOGO */}
+        {/* LOGO - SHIFTED LEFT ON DESKTOP */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-white font-bold text-lg tracking-wide absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0"
+          className="flex items-center gap-2 text-white font-bold text-lg tracking-wide absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:mr-6 transition-all duration-300 hover:scale-105 hover:brightness-110"
         >
           <Image
             src="/logo/UMERO-new-logo.svg"
@@ -75,13 +82,19 @@ export default function Navbar() {
             height={90}
             priority
           />
-          <span>UMERO</span>
+          <span className="tracking-wider">UMERO</span>
         </Link>
 
         {/* DESKTOP GLASS NAVBAR */}
-        <div className="hidden md:flex flex-1 glass rounded-2xl px-6 py-3 items-center justify-between relative">
+        <div
+          className={`hidden md:flex flex-1 glass rounded-2xl px-6 py-3 items-center justify-between relative transition-all duration-300 ${
+            scrolled
+              ? "backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+              : "backdrop-blur-md"
+          }`}
+        >
           {/* SEARCH */}
-          <div className="relative flex items-center gap-2 glass px-4 py-2 rounded-xl w-[280px]">
+          <div className="relative flex items-center gap-2 glass px-4 py-2 rounded-xl w-[280px] transition-all duration-300 focus-within:shadow-[0_0_0_2px_rgba(139,92,246,0.6)]">
             <svg
               className="w-4 h-4 text-gray-300"
               fill="none"
@@ -101,16 +114,16 @@ export default function Navbar() {
               placeholder="Search activities"
               readOnly
               onClick={() => setShowDropdown(!showDropdown)}
-              className="bg-transparent outline-none text-sm text-white placeholder-gray-400 w-full cursor-pointer"
+              className="bg-transparent outline-none text-sm text-white placeholder-gray-400 w-full cursor-pointer tracking-wide"
             />
 
             {showDropdown && (
-              <div className="absolute top-full left-0 mt-2 w-full bg-white text-black rounded-xl shadow-lg z-50 overflow-hidden">
+              <div className="absolute top-full left-0 mt-2 w-full bg-white text-black rounded-xl shadow-xl z-50 overflow-hidden">
                 {ACTIVITIES.map((activity) => (
                   <button
                     key={activity}
                     onClick={() => handleSelectActivity(activity)}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 capitalize"
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 capitalize transition-all duration-200"
                   >
                     {activity}
                   </button>
@@ -128,49 +141,10 @@ export default function Navbar() {
           </nav>
         </div>
       </div>
-
-      {/* MOBILE MENU */}
-      {mobileOpen && (
-        <div
-          ref={mobileRef}
-          className="md:hidden mt-3 glass rounded-2xl px-6 py-4 space-y-4"
-        >
-          <div className="flex flex-col gap-2">
-            <p className="text-xs text-gray-400 uppercase tracking-wide">
-              Search activities
-            </p>
-            {ACTIVITIES.map((activity) => (
-              <button
-                key={activity}
-                onClick={() => handleSelectActivity(activity)}
-                className="text-left text-white text-sm px-3 py-2 rounded-lg hover:bg-white/10 capitalize"
-              >
-                {activity}
-              </button>
-            ))}
-          </div>
-
-          <nav className="flex flex-col gap-4 text-sm font-bold text-gray-200">
-            <NavItem href="/" onClick={() => setMobileOpen(false)}>
-              Home
-            </NavItem>
-            <NavItem href="/#about" onClick={() => setMobileOpen(false)}>
-              About
-            </NavItem>
-            <NavItem href="/early-access" onClick={() => setMobileOpen(false)}>
-              Early Access
-            </NavItem>
-            <NavItem href="#reach-us" onClick={() => setMobileOpen(false)}>
-              Reach Us
-            </NavItem>
-          </nav>
-        </div>
-      )}
     </header>
   );
 }
 
-/* NAV ITEM */
 function NavItem({
   href,
   children,
@@ -184,9 +158,10 @@ function NavItem({
     <Link
       href={href}
       onClick={onClick}
-      className="nav-glow relative px-4 py-2 rounded-lg transition-all duration-300 text-white/90"
+      className="relative px-4 py-2 rounded-lg text-white/90 transition-all duration-300 hover:-translate-y-0.5 hover:text-white group"
     >
       {children}
+      <span className="absolute left-4 bottom-1 w-0 h-[2px] bg-white/80 transition-all duration-300 group-hover:w-[60%]"></span>
     </Link>
   );
 }

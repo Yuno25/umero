@@ -314,4 +314,61 @@ body {
 .animate-marquee {
   animation: marquee 18s linear infinite;
 }
+/* SCROLL REVEAL BASE STATE */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
 
+/* ACTIVE STATE */
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-stagger.active > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-stagger.active > *:nth-child(1) {
+  transition-delay: 0.05s;
+}
+.reveal-stagger.active > *:nth-child(2) {
+  transition-delay: 0.1s;
+}
+.reveal-stagger.active > *:nth-child(3) {
+  transition-delay: 0.15s;
+}
+.reveal-stagger.active > *:nth-child(4) {
+  transition-delay: 0.2s;
+}
+
+.watermark-umero {
+  font-size: 18vw;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.05);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.icon-base {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.icon-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
