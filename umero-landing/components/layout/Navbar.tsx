@@ -156,6 +156,45 @@ export default function Navbar() {
             ref={mobileRef}
             className="absolute top-16 left-4 right-4 bg-neutral-900/95 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/10 animate-in fade-in slide-in-from-top-5 duration-300"
           >
+            {/* MOBILE SEARCH */}
+            <div className="relative mb-2">
+              <div className="flex items-center gap-2 bg-white/10 border border-white/20 px-4 py-3 rounded-xl">
+                <svg
+                  className="w-4 h-4 text-gray-300 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search activities"
+                  readOnly
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="bg-transparent outline-none text-sm text-white placeholder-gray-400 w-full cursor-pointer tracking-wide"
+                />
+              </div>
+              {showDropdown && (
+                <div className="absolute top-full left-0 mt-2 w-full bg-white text-black rounded-xl shadow-xl z-50 overflow-hidden">
+                  {ACTIVITIES.map((activity) => (
+                    <button
+                      key={activity}
+                      onClick={() => handleSelectActivity(activity)}
+                      className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 capitalize transition-all duration-200 font-medium"
+                    >
+                      {activity}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <nav className="flex flex-col gap-5 text-white font-semibold text-base">
               <MobileNavItem href="/" onClick={() => setMobileOpen(false)}>
                 Home
