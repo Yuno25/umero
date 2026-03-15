@@ -3,266 +3,380 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import SideDrawer from "./SideDrawer";
 import UserAvatar from "./UserAvatar";
 
-const ACTIVITIES = [
-  "birthday",
-  "party",
-  "photography",
-  "videography",
-  "podcast",
-];
+const ACTIVITIES = ["birthday", "party", "photography", "videography", "podcast"];
+const LOCATIONS = ["Delhi", "Mumbai", "Bangalore", "Pune", "Hyderabad"];
+const TIMES = ["Anytime", "This weekend", "This week", "This month"];
 
 export default function Navbar() {
+
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const router = useRouter();
-  const mobileRef = useRef<HTMLDivElement>(null);
+  const [showActivityDropdown, setShowActivityDropdown] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [showTimeDropdown, setShowTimeDropdown] = useState(false);
 
-  const handleSelectActivity = (activity: string) => {
-    router.push(`/spaces?activity=${activity}`);
-    setShowDropdown(false);
-    setMobileOpen(false);
+  const [selectedActivity, setSelectedActivity] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("Delhi");
+  const [selectedTime, setSelectedTime] = useState("Anytime");
+
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const mobileRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Pages where navbar is ALWAYS black (white background pages)
+  const isHomePage = pathname === "/";
+  const alwaysBlack = !isHomePage; // every page except home is always black
+
+  const handleSearch = () => {
+    const activity = selectedActivity || "any";
+    router.push(`/spaces?activity=${activity}&location=${selectedLocation}&time=${selectedTime}`);
+    setShowActivityDropdown(false);
+    setShowLocationDropdown(false);
+    setShowTimeDropdown(false);
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        mobileRef.current &&
-        !mobileRef.current.contains(event.target as Node)
-      ) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowActivityDropdown(false);
+        setShowLocationDropdown(false);
+        setShowTimeDropdown(false);
+      }
+      if (mobileRef.current && !mobileRef.current.contains(event.target as Node)) {
         setMobileOpen(false);
       }
     }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    if (mobileOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+  // Navbar bg logic:
+  // Home page → transparent until scroll then black
+  // All other pages → always black
+  const navBg = alwaysBlack
+    ? "bg-black"
+    : scrolled
+    ? "bg-black"
+    : "bg-transparent";
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [mobileOpen]);
+  const showSearch = isHomePage;
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-50 px-4 md:top-6 md:left-1/2 md:-translate-x-1/2 md:max-w-7xl">
-        <div className="relative flex items-center justify-between h-16 md:h-auto">
-          {/* MOBILE MENU BUTTON */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-white p-2 transition-all duration-200 hover:scale-110 active:scale-95"
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+      <style>{`
+        @keyframes dd-in {
+          from { opacity:0; transform:translateY(6px) scale(.98); }
+          to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+        .um-dropdown {
+          animation: dd-in .18s cubic-bezier(.16,1,.3,1) both;
+        }
+      `}</style>
+
+      <header className="fixed top-0 left-0 w-full z-50">
+
+        {/* NAVBAR */}
+        <div className={`flex items-center justify-between px-12 py-6 transition-all duration-300 ${navBg}`}>
 
           {/* LOGO */}
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-white font-bold text-lg tracking-wide absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:mr-6 transition-all duration-300 hover:scale-105 hover:brightness-110"
-          >
+          <Link href="/" className="flex items-center gap-1 text-white">
             <Image
               src="/logo/UMERO-new-logo.svg"
               alt="Umero"
-              width={100}
-              height={90}
+              width={85}
+              height={85}
               priority
             />
-            <span className="tracking-wider">UMERO</span>
+            <span
+              className="text-3xl font-bold tracking-wide"
+              style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
+            >
+              UMERO
+            </span>
           </Link>
 
-          {/* DESKTOP GLASS NAVBAR */}
+          {/* DESKTOP NAV */}
+          <div className="hidden md:flex items-center gap-6">
+            <nav className="flex items-center gap-3">
+              <TopNavItem href="/">Home</TopNavItem>
+              <TopNavItem href="/#about">About</TopNavItem>
+              <TopNavItem href="/early-access">Early Access</TopNavItem>
+              <TopNavItem href="#reach-us">Reach Us</TopNavItem>
+            </nav>
+            <Link
+              href="/signup"
+              className="ml-4 px-5 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:bg-gray-200 transition"
+            >
+              Sign Up
+            </Link>
+          </div>
+
+          {/* MOBILE BUTTON */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden text-white"
+          >
+            {mobileOpen ? <X size={26} /> : <Menu size={26} />}
+          </button>
+
+        </div>
+
+        {/* SEARCH BAR — only on home */}
+        {showSearch && (
           <div
-            className={`hidden md:flex flex-1 glass rounded-2xl px-6 py-3 items-center justify-between relative transition-all duration-300 ${
-              scrolled
-                ? "backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
-                : "backdrop-blur-md"
+            ref={searchRef}
+            className={`hidden md:flex absolute left-1/2 -translate-x-1/2 top-[250px] w-full justify-center px-6 z-50 transition-all duration-300 ${
+              scrolled ? "opacity-0 pointer-events-none -translate-y-2" : "opacity-100"
             }`}
           >
-            {/* SEARCH */}
-            <div className="relative flex items-center gap-2 glass px-4 py-2 rounded-xl w-[280px] transition-all duration-300 focus-within:shadow-[0_0_0_2px_rgba(139,92,246,0.6)]">
-              <svg
-                className="w-4 h-4 text-gray-300"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "stretch",
+                borderRadius: "14px",
+                overflow: "visible",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+                background: "rgba(255,255,255,0.18)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.3)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                minWidth: "820px",
+                maxWidth: "900px",
+                width: "100%",
+              }}
+            >
 
-              <input
-                type="text"
-                placeholder="Search activities"
-                readOnly
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="bg-transparent outline-none text-sm text-white placeholder-gray-400 w-full cursor-pointer tracking-wide"
-              />
-
-              {showDropdown && (
-                <div className="absolute top-full left-0 mt-2 w-full bg-white text-black rounded-xl shadow-xl z-50 overflow-hidden">
-                  {ACTIVITIES.map((activity) => (
-                    <button
-                      key={activity}
-                      onClick={() => handleSelectActivity(activity)}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 capitalize transition-all duration-200"
-                    >
-                      {activity}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* NAV LINKS */}
-            <nav className="flex items-center gap-6 text-sm font-bold text-gray-200">
-              <NavItem href="/">Home</NavItem>
-              <NavItem href="/#about">About</NavItem>
-              <NavItem href="/early-access">Early Access</NavItem>
-              <NavItem href="#reach-us">Reach Us</NavItem>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* ================= MOBILE DROPDOWN MENU ================= */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-[9999] md:hidden">
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
-          {/* Menu Panel */}
-          <div
-            ref={mobileRef}
-            className="absolute top-16 left-4 right-4 bg-neutral-900/95 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/10 animate-in fade-in slide-in-from-top-5 duration-300"
-          >
-            {/* MOBILE SEARCH */}
-            <div className="relative mb-2">
-              <div className="flex items-center gap-2 bg-white/10 border border-white/20 px-4 py-3 rounded-xl">
-                <svg
-                  className="w-4 h-4 text-gray-300 shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
+              {/* ACTIVITY */}
+              <div style={{ position: "relative", flex: 1, borderRight: "1px solid rgba(255,255,255,0.2)" }}>
+                <button
+                  onClick={() => {
+                    setShowActivityDropdown(!showActivityDropdown);
+                    setShowLocationDropdown(false);
+                    setShowTimeDropdown(false);
+                  }}
+                  style={{
+                    width: "100%", textAlign: "left",
+                    padding: "14px 24px",
+                    background: "transparent", border: "none", cursor: "pointer",
+                    borderRadius: "14px 0 0 14px",
+                  }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search activities"
-                  readOnly
-                  onClick={() => setShowDropdown(!showDropdown)}
-                  className="bg-transparent outline-none text-sm text-white placeholder-gray-400 w-full cursor-pointer tracking-wide"
-                />
+                  <p style={{ fontSize: "10px", fontWeight: 700, color: "rgba(255,255,255,0.7)", textTransform: "uppercase", letterSpacing: ".1em", margin: "0 0 3px" }}>
+                    What are you planning?
+                  </p>
+                  <p style={{ fontSize: "15px", fontWeight: 600, color: selectedActivity ? "#fff" : "rgba(255,255,255,0.5)", margin: 0 }}>
+                    {selectedActivity || "Enter your activity"}
+                  </p>
+                </button>
+
+                {showActivityDropdown && (
+                  <div
+                    className="um-dropdown"
+                    style={{
+                      position: "absolute", top: "calc(100% + 8px)", left: 0,
+                      width: "100%", zIndex: 100,
+                      background: "rgba(255,255,255,0.92)",
+                      backdropFilter: "blur(20px)",
+                      WebkitBackdropFilter: "blur(20px)",
+                      borderRadius: "12px",
+                      border: "1px solid rgba(255,255,255,0.6)",
+                      boxShadow: "0 16px 48px rgba(0,0,0,0.18)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {ACTIVITIES.map((a) => (
+                      <button
+                        key={a}
+                        onClick={() => { setSelectedActivity(a); setShowActivityDropdown(false); }}
+                        style={{
+                          width: "100%", textAlign: "left",
+                          padding: "12px 20px",
+                          background: "transparent", border: "none",
+                          cursor: "pointer", fontSize: "14px",
+                          fontWeight: 600, color: "#0A0A0A",
+                          textTransform: "capitalize",
+                          borderBottom: "1px solid rgba(0,0,0,.06)",
+                          transition: "background .15s",
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(0,0,255,.06)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        {a}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-              {showDropdown && (
-                <div className="absolute top-full left-0 mt-2 w-full bg-white text-black rounded-xl shadow-xl z-50 overflow-hidden">
-                  {ACTIVITIES.map((activity) => (
-                    <button
-                      key={activity}
-                      onClick={() => handleSelectActivity(activity)}
-                      className="w-full px-4 py-3 text-left text-sm hover:bg-gray-100 capitalize transition-all duration-200 font-medium"
-                    >
-                      {activity}
-                    </button>
-                  ))}
-                </div>
-              )}
+
+              {/* LOCATION */}
+              <div style={{ position: "relative", flex: 1, borderRight: "1px solid rgba(255,255,255,0.2)" }}>
+                <button
+                  onClick={() => {
+                    setShowLocationDropdown(!showLocationDropdown);
+                    setShowActivityDropdown(false);
+                    setShowTimeDropdown(false);
+                  }}
+                  style={{
+                    width: "100%", textAlign: "left",
+                    padding: "14px 24px",
+                    background: "transparent", border: "none", cursor: "pointer",
+                  }}
+                >
+                  <p style={{ fontSize: "10px", fontWeight: 700, color: "rgba(255,255,255,0.7)", textTransform: "uppercase", letterSpacing: ".1em", margin: "0 0 3px" }}>
+                    Where?
+                  </p>
+                  <p style={{ fontSize: "15px", fontWeight: 600, color: "#fff", margin: 0 }}>
+                    {selectedLocation}
+                  </p>
+                </button>
+
+                {showLocationDropdown && (
+                  <div
+                    className="um-dropdown"
+                    style={{
+                      position: "absolute", top: "calc(100% + 8px)", left: 0,
+                      width: "100%", zIndex: 100,
+                      background: "rgba(255,255,255,0.92)",
+                      backdropFilter: "blur(20px)",
+                      WebkitBackdropFilter: "blur(20px)",
+                      borderRadius: "12px",
+                      border: "1px solid rgba(255,255,255,0.6)",
+                      boxShadow: "0 16px 48px rgba(0,0,0,0.18)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {LOCATIONS.map((l) => (
+                      <button
+                        key={l}
+                        onClick={() => { setSelectedLocation(l); setShowLocationDropdown(false); }}
+                        style={{
+                          width: "100%", textAlign: "left",
+                          padding: "12px 20px",
+                          background: "transparent", border: "none",
+                          cursor: "pointer", fontSize: "14px",
+                          fontWeight: 600, color: "#0A0A0A",
+                          borderBottom: "1px solid rgba(0,0,0,.06)",
+                          transition: "background .15s",
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(0,0,255,.06)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* TIME */}
+              <div style={{ position: "relative", flex: 1, borderRight: "1px solid rgba(255,255,255,0.2)" }}>
+                <button
+                  onClick={() => {
+                    setShowTimeDropdown(!showTimeDropdown);
+                    setShowActivityDropdown(false);
+                    setShowLocationDropdown(false);
+                  }}
+                  style={{
+                    width: "100%", textAlign: "left",
+                    padding: "14px 24px",
+                    background: "transparent", border: "none", cursor: "pointer",
+                  }}
+                >
+                  <p style={{ fontSize: "10px", fontWeight: 700, color: "rgba(255,255,255,0.7)", textTransform: "uppercase", letterSpacing: ".1em", margin: "0 0 3px" }}>
+                    When?
+                  </p>
+                  <p style={{ fontSize: "15px", fontWeight: 600, color: "#fff", margin: 0 }}>
+                    {selectedTime}
+                  </p>
+                </button>
+
+                {showTimeDropdown && (
+                  <div
+                    className="um-dropdown"
+                    style={{
+                      position: "absolute", top: "calc(100% + 8px)", left: 0,
+                      width: "100%", zIndex: 100,
+                      background: "rgba(255,255,255,0.92)",
+                      backdropFilter: "blur(20px)",
+                      WebkitBackdropFilter: "blur(20px)",
+                      borderRadius: "12px",
+                      border: "1px solid rgba(255,255,255,0.6)",
+                      boxShadow: "0 16px 48px rgba(0,0,0,0.18)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {TIMES.map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => { setSelectedTime(t); setShowTimeDropdown(false); }}
+                        style={{
+                          width: "100%", textAlign: "left",
+                          padding: "12px 20px",
+                          background: "transparent", border: "none",
+                          cursor: "pointer", fontSize: "14px",
+                          fontWeight: 600, color: "#0A0A0A",
+                          borderBottom: "1px solid rgba(0,0,0,.06)",
+                          transition: "background .15s",
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = "rgba(0,0,255,.06)")}
+                        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* SEARCH BUTTON */}
+              <button
+                onClick={handleSearch}
+                style={{
+                  background: "#0000FF",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "0 14px 14px 0",
+                  padding: "14px 32px",
+                  fontSize: "15px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  letterSpacing: ".01em",
+                  transition: "background .2s",
+                  whiteSpace: "nowrap",
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = "#0000CC")}
+                onMouseLeave={e => (e.currentTarget.style.background = "#0000FF")}
+              >
+                Search
+              </button>
+
             </div>
-
-            <nav className="flex flex-col gap-5 text-white font-semibold text-base">
-              <MobileNavItem href="/" onClick={() => setMobileOpen(false)}>
-                Home
-              </MobileNavItem>
-
-              <MobileNavItem
-                href="/#about"
-                onClick={() => setMobileOpen(false)}
-              >
-                About
-              </MobileNavItem>
-
-              <MobileNavItem
-                href="/early-access"
-                onClick={() => setMobileOpen(false)}
-              >
-                Early Access
-              </MobileNavItem>
-
-              <MobileNavItem
-                href="#reach-us"
-                onClick={() => setMobileOpen(false)}
-              >
-                Reach Us
-              </MobileNavItem>
-            </nav>
           </div>
-        </div>
-      )}
+        )}
+
+      </header>
     </>
   );
 }
 
-function NavItem({
-  href,
-  children,
-  onClick,
-}: {
-  href: string;
-  children: React.ReactNode;
-  onClick?: () => void;
-}) {
+function TopNavItem({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link
       href={href}
-      onClick={onClick}
-      className="relative px-4 py-2 rounded-lg text-white/90 transition-all duration-300 hover:-translate-y-0.5 hover:text-white group"
-    >
-      {children}
-      <span className="absolute left-4 bottom-1 w-0 h-[2px] bg-white/80 transition-all duration-300 group-hover:w-[60%]"></span>
-    </Link>
-  );
-}
-
-function MobileNavItem({
-  href,
-  children,
-  onClick,
-}: {
-  href: string;
-  children: React.ReactNode;
-  onClick?: () => void;
-}) {
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className="py-2 border-b border-white/10 hover:text-purple-400 transition-colors duration-200"
+      className="px-4 py-2 text-base font-semibold text-white/90 hover:text-white hover:scale-105 transition-all duration-200"
     >
       {children}
     </Link>

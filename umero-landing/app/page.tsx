@@ -4,6 +4,7 @@ import WhyUmero from "@/components/sections/WhyUmero";
 import EarlyAccessSection from "@/components/sections/EarlyAccessSection";
 import ReachUs from "@/components/sections/ReachUs";
 import HomeClient from "@/components/HomeClient";
+import HostSection from "@/components/sections/HostSection";
 
 
 
@@ -15,8 +16,10 @@ export default function HomePage() {
       <Hero />
       <About />
       <WhyUmero />
+      <HostSection/>
       <EarlyAccessSection />
       <ReachUs />
+     
     </>
   );
 }

@@ -20,10 +20,8 @@ export default function Hero() {
   }, []);
 
   return (
-    <section
-      id="home"
-      className="min-h-screen flex items-center justify-center relative px-6 overflow-hidden"
-    >
+    <section id="home" className="min-h-screen relative overflow-hidden">
+
       {/* Background slideshow */}
       {images.map((img, index) => (
         <div
@@ -35,24 +33,44 @@ export default function Hero() {
         />
       ))}
 
-      {/* Dark transparent overlay */}
-      <div className="absolute inset-0 bg-black/60 z-10" />
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/55 z-10" />
 
-      {/* YOUR ORIGINAL CONTENT (UNCHANGED) */}
-      <div className="relative z-20 max-w-3xl text-center text-white">
-        <h1 className="text-5xl font-bold mb-4 leading-tight">
-          Rent. Host. Connect.
+      {/* HERO TEXT */}
+      <div className="absolute bottom-16 left-8 md:left-16 z-20 text-white max-w-4xl">
+
+        <h1
+          className="text-6xl md:text-[82px] font-light tracking-[-0.02em] leading-none mb-4"
+          style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+        >
+          The Right Space.
+          <br />
+
+          <span
+            className="text-[0.95em] font-light italic opacity-90"
+            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+          >
+            Changes Everything.
+          </span>
         </h1>
 
-        <p className="text-lg opacity-80">
-         Your Moment Deserves the Right Space
+        <p
+          className="text-sm font-light tracking-[0.15em] opacity-50 mt-3"
+          style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+        >
+          Your Moment Deserves The Right Space
         </p>
+
       </div>
 
-      {/* Scroll Cue (UNCHANGED) */}
-      <div className="absolute bottom-10 text-sm opacity-60 animate-bounce z-20 text-white">
-        ↓ Scroll
+      {/* Scroll cue */}
+      <div
+        className="absolute bottom-10 right-8 text-sm opacity-40 animate-bounce z-20 text-white tracking-widest"
+        style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+      >
+        ↓ scroll
       </div>
+
     </section>
   );
 }

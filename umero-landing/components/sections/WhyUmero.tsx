@@ -5,24 +5,24 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const slides = [
   {
-    image: "/logo/1.jpg",
+      image: "/logo/haaha1.jpg",
     tag: "For Everyone",
     title: "Spaces that\nfeel like you.",
-    body: "Handpicked rooftops, studios, farmhouses and creative offices across Delhi — chosen for their character, not just their square footage. Every space on Umero is unique. None of them feel like a conference room.",
+    body: "Handpicked rooftops, studios, farmhouses and creative offices across India — chosen for their character, not just their square footage. Every space on Umero is unique. None of them feel like a conference room.",
     stat: "6+ spaces · Delhi",
   },
   {
-    image: "/logo/2.jpg",
+     image: "/logo/hahah2.jpg",
     tag: "For Renters",
     title: "Book in\nunder 2 minutes.",
     body: "Real photos. Verified reviews. Transparent pricing. Pick your slot, pay securely, get the address. No calls. No back-and-forth. Ever.",
     stat: "From ₹899/hr",
   },
   {
-    image: "/logo/3.jpg",
+ image: "/logo/ahaha3.jpg",
     tag: "For Hosts",
     title: "Your space,\nyour rules.",
-    body: "Set your own price. Approve every booking. Block dates whenever you want. List for free — commission only when you actually earn. First 3 bookings at 0%.",
+    body: "Set your own price. Approve every booking. Block dates whenever you want. List for free — commission only when you actually earn. First bookings at 0%.",
     stat: "₹0 to list · Always",
   },
 ];
@@ -51,7 +51,7 @@ export default function WhyUmero() {
       <div className="why-row">
 
         {/* LEFT: Image */}
-        <div className="why-image-wrap">
+       <div className="why-image-wrap" style={{ maxWidth: "480px", maxHeight: "560px" }}>
           <AnimatePresence mode="wait">
             <motion.img
               key={`img-${current}`}
