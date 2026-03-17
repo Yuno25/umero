@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import useInView from "@/hooks/useInView";
 export default function EarlyAccessSection() {
-  const { ref, visible } = useInView(0.3);
+  const { ref, visible } = useInView();
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {

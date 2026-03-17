@@ -149,7 +149,7 @@ export default function Navbar() {
                   onClick={() => setDrawerOpen(true)}
                   className="ml-4 cursor-pointer"
                 >
-                  <UserAvatar user={user} />
+                  <UserAvatar onClick={() => setDrawerOpen(true)} />
                 </div>
 
                 <SideDrawer

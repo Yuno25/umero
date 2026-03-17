@@ -6,7 +6,7 @@ import useInView from "@/hooks/useInView";
 const images = ["/logo/1.jpg", "/logo/2.jpg", "/logo/3.jpg"];
 
 export default function Hero() {
-  const { ref, visible } = useInView(0.1);
+  const { ref, visible } = useInView();
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {

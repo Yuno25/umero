@@ -29,7 +29,7 @@ const slides = [
 ];
 
 export default function WhyUmero() {
-  const { ref, visible } = useInView(0.3);
+  const { ref, visible } = useInView();
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
 

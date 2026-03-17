@@ -2,13 +2,16 @@
 
 import { useAuth } from "@/lib/useAuth";
 
-export default function UserAvatar({ onClick }: { onClick: () => void }) {
-  const { user } = useAuth();
+export default function UserAvatar({ onClick }: { onClick?: () => void }) {
+  const { user, loading } = useAuth();
+
+  // Don't render until auth is loaded
+  if (loading || !user) return null;
 
   const firstLetter =
     user?.username?.charAt(0)?.toUpperCase() ||
     user?.email?.charAt(0)?.toUpperCase() ||
-    "G";
+    "U";
 
   return (
     <button

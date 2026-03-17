@@ -17,7 +17,7 @@ const lines = [
 ];
 
 export default function HostSection() {
-  const { ref, visible } = useInView(0.2);
+  const { ref, visible } = useInView();
 
   return (
     <>

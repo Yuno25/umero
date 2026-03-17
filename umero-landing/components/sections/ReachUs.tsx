@@ -27,7 +27,7 @@ const socialLinks = [
 ];
 
 export default function ReachUs() {
-  const { ref, visible } = useInView(0.1);
+  const { ref, visible } = useInView();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -46,7 +46,7 @@ const cards = [
 ];
 
 export default function About() {
-  const { ref, visible } = useInView(0.1);
+  const { ref, visible } = useInView();
 
   return (
     <section
