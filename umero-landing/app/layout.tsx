@@ -1,7 +1,15 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { DM_Sans } from "next/font/google";
 import ClientShell from "@/components/ClientShell";
 import { AuthProvider } from "@/lib/useAuth";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Umero | Urban Rental Platform",
   description: "Premium peer-to-peer urban rental platform",

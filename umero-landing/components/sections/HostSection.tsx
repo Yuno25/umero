@@ -1,32 +1,23 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import useInView from "@/hooks/useInView";
 
 const lines = [
   { text: "Café open 9am to 9pm —", highlight: "what about the other hours?" },
-  { text: "Airbnb not running on weekends —", highlight: "those days are money left behind." },
+  {
+    text: "Airbnb not running on weekends —",
+    highlight: "those days are money left behind.",
+  },
   { text: "Farmhouse used once a month —", highlight: "list it by the hour." },
-  { text: "Factory floor sitting empty —", highlight: "someone needs it right now." },
+  {
+    text: "Factory floor sitting empty —",
+    highlight: "someone needs it right now.",
+  },
 ];
 
-function useInView(threshold = 0.1) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
-      { threshold }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return { ref, visible };
-}
-
 export default function HostSection() {
-  const { ref: sRef, visible: sVis } = useInView(0.08);
+  const { ref, visible } = useInView(0.2);
 
   return (
     <>
@@ -77,7 +68,7 @@ export default function HostSection() {
         <div style={{ height: "1px", background: "rgba(0,0,0,.08)" }} />
 
         <div
-          ref={sRef}
+          ref={ref}
           style={{
             maxWidth: "1200px",
             margin: "0 auto",
@@ -88,26 +79,40 @@ export default function HostSection() {
             alignItems: "center",
           }}
         >
-
           {/* ══ LEFT ══ */}
           <div>
             {/* Eyebrow */}
-            <div style={{
-              display: "flex", alignItems: "center", gap: "10px",
-              marginBottom: "32px",
-              opacity: sVis ? 1 : 0,
-              animation: sVis ? "hs-fade-up .6s cubic-bezier(.16,1,.3,1) both" : "none",
-            }}>
-              <div style={{
-                width: "7px", height: "7px", borderRadius: "50%",
-                background: "#0000FF", flexShrink: 0,
-                animation: "hs-pulse 2s ease-in-out infinite",
-              }} />
-              <span style={{
-                fontSize: "10px", fontWeight: 600,
-                letterSpacing: ".2em", textTransform: "uppercase",
-                color: "#0000FF",
-              }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                marginBottom: "32px",
+                opacity: visible ? 1 : 0,
+                animation: visible
+                  ? "hs-fade-up .6s cubic-bezier(.16,1,.3,1) both"
+                  : "none",
+              }}
+            >
+              <div
+                style={{
+                  width: "7px",
+                  height: "7px",
+                  borderRadius: "50%",
+                  background: "#0000FF",
+                  flexShrink: 0,
+                  animation: "hs-pulse 2s ease-in-out infinite",
+                }}
+              />
+              <span
+                style={{
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  letterSpacing: ".2em",
+                  textTransform: "uppercase",
+                  color: "#0000FF",
+                }}
+              >
                 For Space Owners
               </span>
             </div>
@@ -115,52 +120,86 @@ export default function HostSection() {
             {/* Headline */}
             <div style={{ marginBottom: "36px" }}>
               <div style={{ overflow: "hidden" }}>
-                <h2 style={{
-                  fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-                  fontSize: "clamp(44px, 5.5vw, 76px)",
-                  fontWeight: 900, letterSpacing: "-0.04em",
-                  lineHeight: 0.95, color: "#0A0A0A", margin: "0 0 4px",
-                  opacity: sVis ? 1 : 0,
-                  animation: sVis ? "hs-title-in .85s .1s cubic-bezier(.16,1,.3,1) both" : "none",
-                }}>
+                <h2
+                  style={{
+                    fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
+                    fontSize: "clamp(44px, 5.5vw, 76px)",
+                    fontWeight: 900,
+                    letterSpacing: "-0.04em",
+                    lineHeight: 0.95,
+                    color: "#0A0A0A",
+                    margin: "0 0 4px",
+                    opacity: visible ? 1 : 0,
+                    animation: visible
+                      ? "hs-title-in .85s .1s cubic-bezier(.16,1,.3,1) both"
+                      : "none",
+                  }}
+                >
                   Own a Space?
                 </h2>
               </div>
               <div style={{ overflow: "hidden" }}>
-                <h2 style={{
-                  fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-                  fontSize: "clamp(44px, 5.5vw, 76px)",
-                  fontWeight: 900, letterSpacing: "-0.04em",
-                  lineHeight: 0.95, color: "#0000EE", margin: 0,
-                  opacity: sVis ? 1 : 0,
-                  animation: sVis ? "hs-title-in .9s .18s cubic-bezier(.16,1,.3,1) both" : "none",
-                }}>
+                <h2
+                  style={{
+                    fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
+                    fontSize: "clamp(44px, 5.5vw, 76px)",
+                    fontWeight: 900,
+                    letterSpacing: "-0.04em",
+                    lineHeight: 0.95,
+                    color: "#0000EE",
+                    margin: 0,
+                    opacity: visible ? 1 : 0,
+                    animation: visible
+                      ? "hs-title-in .9s .18s cubic-bezier(.16,1,.3,1) both"
+                      : "none",
+                  }}
+                >
                   Start Earning.
                 </h2>
               </div>
             </div>
 
             {/* Punchy lines */}
-            <div style={{ marginBottom: "40px", display: "flex", flexDirection: "column" }}>
+            <div
+              style={{
+                marginBottom: "40px",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
               {lines.map((l, i) => (
                 <div
                   key={i}
                   className="hs-line-item"
                   style={{
                     padding: "14px 0",
-                    borderBottom: i < lines.length - 1 ? "1px solid rgba(0,0,0,.06)" : "none",
-                    opacity: sVis ? 1 : 0,
-                    animation: sVis
-                      ? `hs-fade-up .65s ${.3 + i * .1}s cubic-bezier(.16,1,.3,1) both`
+                    borderBottom:
+                      i < lines.length - 1
+                        ? "1px solid rgba(0,0,0,.06)"
+                        : "none",
+                    opacity: visible ? 1 : 0,
+                    animation: visible
+                      ? `hs-fade-up .65s ${0.3 + i * 0.1}s cubic-bezier(.16,1,.3,1) both`
                       : "none",
                   }}
                 >
-                  <p style={{
-                    fontSize: "14px", lineHeight: 1.6, margin: 0,
-                    fontWeight: 300, color: "rgba(0,0,0,.38)",
-                  }}>
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      lineHeight: 1.6,
+                      margin: 0,
+                      fontWeight: 300,
+                      color: "rgba(0,0,0,.38)",
+                    }}
+                  >
                     {l.text}{" "}
-                    <em style={{ fontStyle: "italic", fontWeight: 400, color: "#0000EE" }}>
+                    <em
+                      style={{
+                        fontStyle: "italic",
+                        fontWeight: 400,
+                        color: "#0000EE",
+                      }}
+                    >
                       {l.highlight}
                     </em>
                   </p>
@@ -169,61 +208,96 @@ export default function HostSection() {
             </div>
 
             {/* Unlock line */}
-            <p style={{
-              fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-              fontSize: "clamp(18px, 2vw, 24px)", fontWeight: 800,
-              letterSpacing: "-0.03em", color: "#0A0A0A",
-              margin: "0 0 36px", lineHeight: 1.25,
-              opacity: sVis ? 1 : 0,
-              animation: sVis ? "hs-fade-up .7s .72s cubic-bezier(.16,1,.3,1) both" : "none",
-            }}>
-              Give your space by the hour.<br />
+            <p
+              style={{
+                fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
+                fontSize: "clamp(18px, 2vw, 24px)",
+                fontWeight: 800,
+                letterSpacing: "-0.03em",
+                color: "#0A0A0A",
+                margin: "0 0 36px",
+                lineHeight: 1.25,
+                opacity: visible ? 1 : 0,
+                animation: visible
+                  ? "hs-fade-up .7s .72s cubic-bezier(.16,1,.3,1) both"
+                  : "none",
+              }}
+            >
+              Give your space by the hour.
+              <br />
               Unlock endless possibilities to earn.
             </p>
 
             {/* CTA */}
-            <div style={{
-              opacity: sVis ? 1 : 0,
-              animation: sVis ? "hs-fade-up .65s .82s cubic-bezier(.16,1,.3,1) both" : "none",
-              display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap",
-            }}>
+            <div
+              style={{
+                opacity: visible ? 1 : 0,
+                animation: visible
+                  ? "hs-fade-up .65s .82s cubic-bezier(.16,1,.3,1) both"
+                  : "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "20px",
+                flexWrap: "wrap",
+              }}
+            >
               <button
                 className="hs-cta"
-                 onClick={() => window.open("https://docs.google.com/forms/d/e/1FAIpQLSd-f3OruVj0m_PUsYoBIyRNYtmvUGnjMYX45Bk4S9tJ0qt0cA/viewform?usp=dialog", "_blank")}
-  
+                onClick={() =>
+                  window.open(
+                    "https://docs.google.com/forms/d/e/1FAIpQLSd-f3OruVj0m_PUsYoBIyRNYtmvUGnjMYX45Bk4S9tJ0qt0cA/viewform?usp=dialog",
+                    "_blank",
+                  )
+                }
                 style={{
-                  background: "#0000FF", color: "#fff", border: "none",
-                  borderRadius: "12px", padding: "16px 34px",
-                  fontSize: "14px", fontWeight: 700,
-                  fontFamily: "'DM Sans', sans-serif", letterSpacing: ".01em",
+                  background: "#0000FF",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "12px",
+                  padding: "16px 34px",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  fontFamily: "'DM Sans', sans-serif",
+                  letterSpacing: ".01em",
                   boxShadow: "0 8px 28px rgba(0,0,255,.22)",
                 }}
               >
                 List Your Space →
               </button>
-              <span style={{
-                fontSize: "11px", color: "rgba(0,0,0,.3)",
-                fontWeight: 400, letterSpacing: ".01em",
-              }}>
+              <span
+                style={{
+                  fontSize: "11px",
+                  color: "rgba(0,0,0,.3)",
+                  fontWeight: 400,
+                  letterSpacing: ".01em",
+                }}
+              >
                 Free to list · Zero commission on first event
               </span>
             </div>
           </div>
 
           {/* ══ RIGHT — Photo ══ */}
-          <div style={{
-            opacity: sVis ? 1 : 0,
-            animation: sVis ? "hs-img-in 1s .2s cubic-bezier(.16,1,.3,1) both" : "none",
-            position: "relative",
-          }}>
-            {/* Photo frame */}
-            <div style={{
-              borderRadius: "24px",
-              overflow: "hidden",
+          <div
+            style={{
+              opacity: visible ? 1 : 0,
+              animation: visible
+                ? "hs-img-in 1s .2s cubic-bezier(.16,1,.3,1) both"
+                : "none",
               position: "relative",
-              aspectRatio: "4/5",
-              boxShadow: "0 24px 72px rgba(0,0,0,.18), 0 4px 16px rgba(0,0,0,.1)",
-            }}>
+            }}
+          >
+            {/* Photo frame */}
+            <div
+              style={{
+                borderRadius: "24px",
+                overflow: "hidden",
+                position: "relative",
+                aspectRatio: "4/5",
+                boxShadow:
+                  "0 24px 72px rgba(0,0,0,.18), 0 4px 16px rgba(0,0,0,.1)",
+              }}
+            >
               {/* Image — no fallback div, just the real photo */}
               <img
                 src="/uploads/listers/ownaspace.jpg"
@@ -238,105 +312,176 @@ export default function HostSection() {
               />
 
               {/* Bottom gradient overlay */}
-              <div style={{
-                position: "absolute",
-                bottom: 0, left: 0, right: 0,
-                height: "60%",
-                background: "linear-gradient(to top, rgba(0,0,0,.8), transparent)",
-                zIndex: 1,
-                pointerEvents: "none",
-              }} />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: "60%",
+                  background:
+                    "linear-gradient(to top, rgba(0,0,0,.8), transparent)",
+                  zIndex: 1,
+                  pointerEvents: "none",
+                }}
+              />
 
               {/* Founding Host badge — top right */}
-              <div style={{
-                position: "absolute", top: "18px", right: "18px", zIndex: 2,
-                background: "#0000FF", borderRadius: "100px",
-                padding: "6px 14px",
-                display: "flex", alignItems: "center", gap: "6px",
-              }}>
-                <div style={{
-                  width: "5px", height: "5px", borderRadius: "50%",
-                  background: "#fff",
-                  animation: "hs-pulse 2s ease-in-out infinite",
-                }} />
-                <span style={{
-                  fontSize: "9px", fontWeight: 700, color: "#fff",
-                  letterSpacing: ".12em", textTransform: "uppercase",
-                  fontFamily: "'DM Sans', sans-serif",
-                }}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: "18px",
+                  right: "18px",
+                  zIndex: 2,
+                  background: "#0000FF",
+                  borderRadius: "100px",
+                  padding: "6px 14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <div
+                  style={{
+                    width: "5px",
+                    height: "5px",
+                    borderRadius: "50%",
+                    background: "#fff",
+                    animation: "hs-pulse 2s ease-in-out infinite",
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: "9px",
+                    fontWeight: 700,
+                    color: "#fff",
+                    letterSpacing: ".12em",
+                    textTransform: "uppercase",
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
                   Founding Host
                 </span>
               </div>
 
               {/* Earning badge — bottom left */}
-              <div style={{
-                position: "absolute", bottom: "24px", left: "24px", zIndex: 2,
-                background: "rgba(255,255,255,.12)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                border: "1px solid rgba(255,255,255,.18)",
-                borderRadius: "14px", padding: "14px 18px",
-                display: "flex", flexDirection: "column", gap: "4px",
-              }}>
-                <span style={{
-                  fontSize: "10px", color: "rgba(255,255,255,.55)",
-                  fontFamily: "'DM Sans', sans-serif",
-                  letterSpacing: ".1em", textTransform: "uppercase", fontWeight: 500,
-                }}>
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "24px",
+                  left: "24px",
+                  zIndex: 2,
+                  background: "rgba(255,255,255,.12)",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  border: "1px solid rgba(255,255,255,.18)",
+                  borderRadius: "14px",
+                  padding: "14px 18px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "4px",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "10px",
+                    color: "rgba(255,255,255,.55)",
+                    fontFamily: "'DM Sans', sans-serif",
+                    letterSpacing: ".1em",
+                    textTransform: "uppercase",
+                    fontWeight: 500,
+                  }}
+                >
                   Earning potential
                 </span>
-                <span style={{
-                  fontSize: "22px",
-                  fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-                  fontWeight: 900, color: "#FFFFFF",
-                  letterSpacing: "-0.03em", lineHeight: 1,
-                }}>
+                <span
+                  style={{
+                    fontSize: "22px",
+                    fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
+                    fontWeight: 900,
+                    color: "#FFFFFF",
+                    letterSpacing: "-0.03em",
+                    lineHeight: 1,
+                  }}
+                >
                   ₹899 / hr
                 </span>
-                <span style={{
-                  fontSize: "10px", color: "rgba(255,255,255,.4)",
-                  fontFamily: "'DM Sans', sans-serif", fontWeight: 300,
-                }}>
+                <span
+                  style={{
+                    fontSize: "10px",
+                    color: "rgba(255,255,255,.4)",
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontWeight: 300,
+                  }}
+                >
                   avg. listing starts from
                 </span>
               </div>
             </div>
 
             {/* Floating 0% card */}
-            <div style={{
-              position: "absolute", bottom: "-20px", right: "-20px",
-              background: "#FFFFFF", border: "1px solid rgba(0,0,0,.08)",
-              borderRadius: "16px", padding: "16px 20px",
-              boxShadow: "0 8px 32px rgba(0,0,0,.1)",
-              display: "flex", flexDirection: "column", gap: "4px",
-              minWidth: "140px", zIndex: 3,
-            }}>
-              <span style={{
-                fontSize: "9px", fontWeight: 600,
-                letterSpacing: ".14em", textTransform: "uppercase",
-                color: "rgba(0,0,0,.3)", fontFamily: "'DM Sans', sans-serif",
-              }}>
+            <div
+              style={{
+                position: "absolute",
+                bottom: "-20px",
+                right: "-20px",
+                background: "#FFFFFF",
+                border: "1px solid rgba(0,0,0,.08)",
+                borderRadius: "16px",
+                padding: "16px 20px",
+                boxShadow: "0 8px 32px rgba(0,0,0,.1)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+                minWidth: "140px",
+                zIndex: 3,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "9px",
+                  fontWeight: 600,
+                  letterSpacing: ".14em",
+                  textTransform: "uppercase",
+                  color: "rgba(0,0,0,.3)",
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
                 Commission
               </span>
-              <span style={{
-                fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-                fontSize: "28px", fontWeight: 900,
-                color: "#0000EE", letterSpacing: "-0.04em", lineHeight: 1,
-              }}>
+              <span
+                style={{
+                  fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
+                  fontSize: "28px",
+                  fontWeight: 900,
+                  color: "#0000EE",
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1,
+                }}
+              >
                 0%
               </span>
-              <span style={{
-                fontSize: "10px", color: "rgba(0,0,0,.35)",
-                fontFamily: "'DM Sans', sans-serif", fontWeight: 300,
-              }}>
+              <span
+                style={{
+                  fontSize: "10px",
+                  color: "rgba(0,0,0,.35)",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 300,
+                }}
+              >
                 on your first event
               </span>
             </div>
           </div>
-
         </div>
 
-        <div style={{ height: "1px", background: "rgba(0,0,0,.07)", margin: "0 48px" }} />
+        <div
+          style={{
+            height: "1px",
+            background: "rgba(0,0,0,.07)",
+            margin: "0 48px",
+          }}
+        />
       </section>
     </>
   );

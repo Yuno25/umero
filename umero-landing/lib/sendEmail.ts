@@ -1,6 +1,12 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+
+if (!RESEND_API_KEY) {
+  throw new Error("RESEND_API_KEY is not defined in environment variables");
+}
+
+const resend = new Resend(RESEND_API_KEY);
 
 interface SendOTPParams {
   email: string;
@@ -10,27 +16,48 @@ interface SendOTPParams {
 export const sendOTPEmail = async ({ email, otp }: SendOTPParams) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Umero <noreply@umero.in>", // ✅ use your verified domain
-      to: [email],
+      from: "Umero <noreply@umero.in>",
+      to: email,
       subject: "Your Umero verification code",
       html: `
-        <div style="font-family:Arial,sans-serif;padding:20px">
-          <p>Your verification code is:</p>
-          <h2 style="letter-spacing:5px">${otp}</h2>
-          <p>This code expires in 10 minutes.</p>
+        <div style="font-family: Arial, sans-serif; padding: 24px;">
+          <h2 style="margin-bottom:10px;">Umero Verification Code</h2>
+          <p>Your one-time login code is:</p>
+
+          <div style="
+            font-size:28px;
+            font-weight:bold;
+            letter-spacing:6px;
+            background:#f4f4f4;
+            padding:12px 20px;
+            display:inline-block;
+            margin:12px 0;
+            border-radius:6px;
+          ">
+            ${otp}
+          </div>
+
+          <p>This code will expire in <strong>10 minutes</strong>.</p>
+
+          <hr style="margin:20px 0;" />
+
+          <p style="font-size:12px;color:#777;">
+            If you did not request this login, you can safely ignore this email.
+          </p>
         </div>
       `,
     });
 
     if (error) {
-      console.error("Resend error:", error);
-      return false;
+      console.error("Resend API error:", error);
+      throw new Error("Failed to send OTP email");
     }
 
-    console.log("Email sent:", data?.id);
+    console.log("OTP email sent successfully:", data?.id);
+
     return true;
-  } catch (err) {
-    console.error("Email sending failed:", err);
-    return false;
+  } catch (error) {
+    console.error("sendOTPEmail failed:", error);
+    throw error;
   }
 };

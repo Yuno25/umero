@@ -3,31 +3,48 @@ import mongoose from "mongoose";
 const MONGODB_URI = process.env.MONGODB_URI as string;
 
 if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable");
+  throw new Error("MONGODB_URI is not defined in environment variables");
 }
 
-interface MongooseCache {
+interface Cached {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
 }
 
-// @ts-ignore
-let cached: MongooseCache = global.mongoose;
+// Prevent multiple connections in development
+declare global {
+  var mongoose: Cached | undefined;
+}
+
+let cached = global.mongoose;
 
 if (!cached) {
-  // @ts-ignore
   cached = global.mongoose = { conn: null, promise: null };
 }
 
 async function connectDB() {
-  if (cached.conn) return cached.conn;
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => mongoose);
+  if (cached!.conn) {
+    return cached!.conn;
   }
 
-  cached.conn = await cached.promise;
-  return cached.conn;
+  if (!cached!.promise) {
+    const opts = {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000, // fail fast instead of waiting 30s
+      maxPoolSize: 10,
+    };
+
+    cached!.promise = mongoose.connect(MONGODB_URI, opts);
+  }
+
+  try {
+    cached!.conn = await cached!.promise;
+  } catch (error) {
+    cached!.promise = null;
+    throw error;
+  }
+
+  return cached!.conn;
 }
 
 export default connectDB;

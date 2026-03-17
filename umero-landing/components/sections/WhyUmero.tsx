@@ -2,24 +2,25 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import useInView from "@/hooks/useInView";
 
 const slides = [
   {
-      image: "/logo/haaha1.jpg",
+    image: "/logo/haaha1.jpg",
     tag: "For Everyone",
     title: "Spaces that\nfeel like you.",
     body: "Handpicked rooftops, studios, farmhouses and creative offices across India — chosen for their character, not just their square footage. Every space on Umero is unique. None of them feel like a conference room.",
     stat: "6+ spaces · Delhi",
   },
   {
-     image: "/logo/hahah2.jpg",
+    image: "/logo/hahah2.jpg",
     tag: "For Renters",
     title: "Book in\nunder 2 minutes.",
     body: "Real photos. Verified reviews. Transparent pricing. Pick your slot, pay securely, get the address. No calls. No back-and-forth. Ever.",
     stat: "From ₹899/hr",
   },
   {
- image: "/logo/ahaha3.jpg",
+    image: "/logo/ahaha3.jpg",
     tag: "For Hosts",
     title: "Your space,\nyour rules.",
     body: "Set your own price. Approve every booking. Block dates whenever you want. List for free — commission only when you actually earn. First bookings at 0%.",
@@ -28,6 +29,7 @@ const slides = [
 ];
 
 export default function WhyUmero() {
+  const { ref, visible } = useInView(0.3);
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
 
@@ -45,13 +47,16 @@ export default function WhyUmero() {
 
   return (
     <section id="why-umero">
-
-      <div aria-hidden="true" className="why-bg-word">UMERO</div>
+      <div aria-hidden="true" className="why-bg-word">
+        UMERO
+      </div>
 
       <div className="why-row">
-
         {/* LEFT: Image */}
-       <div className="why-image-wrap" style={{ maxWidth: "480px", maxHeight: "560px" }}>
+        <div
+          className="why-image-wrap"
+          style={{ maxWidth: "480px", maxHeight: "560px" }}
+        >
           <AnimatePresence mode="wait">
             <motion.img
               key={`img-${current}`}
@@ -83,18 +88,26 @@ export default function WhyUmero() {
           </AnimatePresence>
 
           <div className="why-nav">
-            <button className="why-arrow" onClick={prev} aria-label="Previous">←</button>
-            <button className="why-arrow" onClick={next} aria-label="Next">→</button>
+            <button className="why-arrow" onClick={prev} aria-label="Previous">
+              ←
+            </button>
+            <button className="why-arrow" onClick={next} aria-label="Next">
+              →
+            </button>
 
             <span className="why-counter">
-              {String(current + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
+              {String(current + 1).padStart(2, "0")} /{" "}
+              {String(slides.length).padStart(2, "0")}
             </span>
 
             <div className="why-dots">
               {slides.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
+                  onClick={() => {
+                    setDirection(i > current ? 1 : -1);
+                    setCurrent(i);
+                  }}
                   className={`why-dot ${i === current ? "active" : "inactive"}`}
                   aria-label={`Slide ${i + 1}`}
                 />
@@ -102,7 +115,6 @@ export default function WhyUmero() {
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );

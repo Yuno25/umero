@@ -25,3 +25,5 @@ export default function useScrollReveal() {
     return () => observer.disconnect();
   }, []);
 }
+
+useScrollReveal;

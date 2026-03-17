@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import useInView from "@/hooks/useInView";
 
-const images = [
-  "/logo/1.jpg",
-  "/logo/2.jpg",
-  "/logo/3.jpg",
-];
+const images = ["/logo/1.jpg", "/logo/2.jpg", "/logo/3.jpg"];
 
 export default function Hero() {
+  const { ref, visible } = useInView(0.1);
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -21,7 +19,6 @@ export default function Hero() {
 
   return (
     <section id="home" className="min-h-screen relative overflow-hidden">
-
       {/* Background slideshow */}
       {images.map((img, index) => (
         <div
@@ -38,17 +35,19 @@ export default function Hero() {
 
       {/* HERO TEXT */}
       <div className="absolute bottom-16 left-8 md:left-16 z-20 text-white max-w-4xl">
-
         <h1
           className="text-6xl md:text-[82px] font-light tracking-[-0.02em] leading-none mb-4"
-          style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+          style={{
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          }}
         >
           The Right Space.
           <br />
-
           <span
             className="text-[0.95em] font-light italic opacity-90"
-            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+            style={{
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+            }}
           >
             Changes Everything.
           </span>
@@ -56,11 +55,12 @@ export default function Hero() {
 
         <p
           className="text-sm font-light tracking-[0.15em] opacity-50 mt-3"
-          style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+          style={{
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          }}
         >
           Your Moment Deserves The Right Space
         </p>
-
       </div>
 
       {/* Scroll cue */}
@@ -70,7 +70,6 @@ export default function Hero() {
       >
         ↓ scroll
       </div>
-
     </section>
   );
 }

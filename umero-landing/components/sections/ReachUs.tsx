@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Mail, Linkedin, Instagram, X } from "lucide-react";
-
+import useInView from "@/hooks/useInView";
 const socialLinks = [
   {
     name: "LinkedIn",
@@ -27,6 +27,7 @@ const socialLinks = [
 ];
 
 export default function ReachUs() {
+  const { ref, visible } = useInView(0.1);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

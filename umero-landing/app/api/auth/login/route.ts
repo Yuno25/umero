@@ -8,7 +8,8 @@ export async function POST(req: Request) {
   try {
     await connectDB();
 
-    const { email } = await req.json();
+    const body = await req.json();
+    const email = body.email?.trim().toLowerCase();
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
@@ -23,31 +24,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // 🔐 GENERATE OTP FOR LOGIN
     const otp = generateOTP();
 
     user.otp = otp;
     user.otpExpiry = getOTPExpiry();
     user.lastAuthAction = "login";
 
-    // 🛡️ Skip validation (password may not exist yet)
     await user.save({ validateBeforeSave: false });
 
-    // ✉️ SEND OTP EMAIL
     await sendOTPEmail({ email, otp });
 
-    return NextResponse.json(
-      {
-        success: true,
-        otpRequired: true,
-        message: "OTP sent to your email. Please verify.",
-      },
-      { status: 200 },
-    );
-  } catch (error) {
+    return NextResponse.json({
+      success: true,
+      otpRequired: true,
+      message: "OTP sent to your email. Please verify.",
+    });
+  } catch (error: any) {
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: error.message || "Internal server error" },
       { status: 500 },
     );
   }
