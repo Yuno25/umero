@@ -357,7 +357,7 @@ body {
   font-size: 18vw;
   font-weight: 800;
   letter-spacing: 0.15em;
-  color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.05);
   white-space: nowrap;
   user-select: none;
 }
@@ -391,7 +391,7 @@ body {
   left: -10px;
   font-size: clamp(80px, 18vw, 200px);
   font-weight: 900;
-  color: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.09);
   line-height: 1;
   user-select: none;
   pointer-events: none;
@@ -582,7 +582,7 @@ body {
 }
 
 .um-card-light:hover {
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.14) !important;
+  box-shadow: 0 24px 56px gray !important;
 }
 
 .um-card-dark:hover {
@@ -597,14 +597,14 @@ body {
 }
 
 .um-card-light:hover .um-tag {
-  background: #0000ff !important;
+  background: black !important;
   color: #fff !important;
   border-color: #0000ff !important;
 }
 
 .um-card-dark:hover .um-tag {
   background: #fff !important;
-  color: #0000ff !important;
+  color: black !important;
   border-color: #fff !important;
 }
 .animate-in {
@@ -648,5 +648,69 @@ body {
   100% {
     opacity: 0;
     transform: translateY(80px) scale(0.96);
+  }
+}
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-dropdown {
+  animation: dropdownIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (max-width: 768px) {
+  .hs-container {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+    padding: 60px 20px 70px !important;
+  }
+
+  .hs-left {
+    order: 2;
+  }
+
+  .hs-right {
+    order: 1;
+  }
+
+  .hs-title {
+    font-size: 42px !important;
+    line-height: 1 !important;
+  }
+
+  .hs-lines p {
+    font-size: 13px !important;
+  }
+
+  .hs-unlock {
+    font-size: 18px !important;
+  }
+
+  .hs-cta-wrap {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .hs-image-card {
+    border-radius: 18px !important;
+  }
+
+  .hs-floating-card {
+    bottom: -10px !important;
+    right: 10px !important;
+    padding: 12px 14px !important;
+  }
+
+  .hs-earning-badge {
+    bottom: 16px !important;
+    left: 16px !important;
+    padding: 10px 14px !important;
   }
 }

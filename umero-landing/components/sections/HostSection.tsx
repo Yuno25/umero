@@ -18,6 +18,25 @@ const lines = [
 
 export default function HostSection() {
   const { ref, visible } = useInView();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+
+    const handler = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches);
+    };
+
+    setIsMobile(mq.matches);
+
+    if (mq.addEventListener) {
+      mq.addEventListener("change", handler);
+      return () => mq.removeEventListener("change", handler);
+    } else {
+      mq.addListener(handler);
+      return () => mq.removeListener(handler);
+    }
+  }, []);
 
   return (
     <>
@@ -54,6 +73,27 @@ export default function HostSection() {
         }
         .hs-line-item { transition: opacity .2s; }
         .hs-line-item:hover { opacity: .75; }
+
+        /* ── Mobile overrides ── */
+        @media (max-width: 767px) {
+          .hs-grid {
+            grid-template-columns: 1fr !important;
+            gap: 48px !important;
+            padding: 64px 24px 80px !important;
+          }
+          .hs-photo-wrap {
+            aspect-ratio: 3/4 !important;
+          }
+          .hs-float-card {
+            bottom: -16px !important;
+            right: 12px !important;
+            padding: 12px 16px !important;
+            min-width: 120px !important;
+          }
+          .hs-float-card-value {
+            font-size: 22px !important;
+          }
+        }
       `}</style>
 
       <section
@@ -69,6 +109,7 @@ export default function HostSection() {
 
         <div
           ref={ref}
+          className="hs-grid"
           style={{
             maxWidth: "1200px",
             margin: "0 auto",
@@ -123,7 +164,7 @@ export default function HostSection() {
                 <h2
                   style={{
                     fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-                    fontSize: "clamp(44px, 5.5vw, 76px)",
+                    fontSize: "clamp(40px, 5.5vw, 76px)",
                     fontWeight: 900,
                     letterSpacing: "-0.04em",
                     lineHeight: 0.95,
@@ -142,7 +183,7 @@ export default function HostSection() {
                 <h2
                   style={{
                     fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-                    fontSize: "clamp(44px, 5.5vw, 76px)",
+                    fontSize: "clamp(40px, 5.5vw, 76px)",
                     fontWeight: 900,
                     letterSpacing: "-0.04em",
                     lineHeight: 0.95,
@@ -285,10 +326,13 @@ export default function HostSection() {
                 ? "hs-img-in 1s .2s cubic-bezier(.16,1,.3,1) both"
                 : "none",
               position: "relative",
+              /* Extra bottom padding on mobile to give the float card room */
+              paddingBottom: isMobile ? "28px" : "0",
             }}
           >
             {/* Photo frame */}
             <div
+              className="hs-photo-wrap"
               style={{
                 borderRadius: "24px",
                 overflow: "hidden",
@@ -298,7 +342,6 @@ export default function HostSection() {
                   "0 24px 72px rgba(0,0,0,.18), 0 4px 16px rgba(0,0,0,.1)",
               }}
             >
-              {/* Image — no fallback div, just the real photo */}
               <img
                 src="/uploads/listers/ownaspace.jpg"
                 alt="Own a space on Umero"
@@ -421,10 +464,11 @@ export default function HostSection() {
 
             {/* Floating 0% card */}
             <div
+              className="hs-float-card"
               style={{
                 position: "absolute",
-                bottom: "-20px",
-                right: "-20px",
+                bottom: isMobile ? "-16px" : "-20px",
+                right: isMobile ? "12px" : "-20px",
                 background: "#FFFFFF",
                 border: "1px solid rgba(0,0,0,.08)",
                 borderRadius: "16px",
@@ -450,6 +494,7 @@ export default function HostSection() {
                 Commission
               </span>
               <span
+                className="hs-float-card-value"
                 style={{
                   fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
                   fontSize: "28px",

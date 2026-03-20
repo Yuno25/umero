@@ -107,10 +107,20 @@ export default function Navbar() {
       <header className="fixed top-0 left-0 w-full z-50">
         {/* NAVBAR */}
         <div
-          className={`flex items-center justify-between px-12 py-6 transition-all duration-300 ${navBg}`}
+          className={`relative flex items-center justify-between px-4 md:px-12 py-4 md:py-6 transition-all duration-300 ${navBg}`}
         >
-          {/* LOGO */}
-          <Link href="/" className="flex items-center gap-1 text-white">
+          {/* LEFT — BURGER (MOBILE ONLY) */}
+          <div className="md:hidden">
+            <button onClick={() => setMobileOpen(true)} className="text-white">
+              <Menu size={26} />
+            </button>
+          </div>
+
+          {/* LOGO — CENTER ON MOBILE, LEFT ON DESKTOP */}
+          <Link
+            href="/"
+            className="flex items-center gap-1 text-white md:static absolute left-1/2 -translate-x-1/2 md:translate-x-0"
+          >
             <Image
               src="/logo/UMERO-new-logo.svg"
               alt="Umero"
@@ -119,14 +129,30 @@ export default function Navbar() {
               priority
             />
             <span
-              className="text-3xl font-bold tracking-wide"
+              className="text-xl md:text-3xl font-bold tracking-wide"
               style={{ fontFamily: "Helvetica, Arial, sans-serif" }}
             >
               UMERO
             </span>
           </Link>
 
-          {/* DESKTOP NAV */}
+          {/* RIGHT — MOBILE SIGNUP / AVATAR */}
+          <div className="md:hidden">
+            {!loading && !user && (
+              <Link
+                href="/signup"
+                className="px-3 py-1.5 rounded-md bg-white text-black text-xs font-semibold"
+              >
+                Sign Up
+              </Link>
+            )}
+
+            {!loading && user && (
+              <UserAvatar onClick={() => setDrawerOpen(true)} />
+            )}
+          </div>
+
+          {/* DESKTOP NAV (UNCHANGED) */}
           <div className="hidden md:flex items-center gap-6">
             <nav className="flex items-center gap-3">
               <TopNavItem href="/">Home</TopNavItem>
@@ -134,6 +160,7 @@ export default function Navbar() {
               <TopNavItem href="/early-access">Early Access</TopNavItem>
               <TopNavItem href="#reach-us">Reach Us</TopNavItem>
             </nav>
+
             {!loading && !user && (
               <Link
                 href="/signup"
@@ -159,15 +186,61 @@ export default function Navbar() {
               </>
             )}
           </div>
-
-          {/* MOBILE BUTTON */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-white"
-          >
-            {mobileOpen ? <X size={26} /> : <Menu size={26} />}
-          </button>
         </div>
+        {mobileOpen && (
+          <div className="absolute top-full left-0 w-full z-50">
+            {/* BACKDROP (click outside to close) */}
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setMobileOpen(false)}
+            />
+
+            {/* DROPDOWN MENU */}
+            <div
+              ref={mobileRef}
+              className="
+        relative z-50
+        bg-black/95 backdrop-blur
+        border-t border-white/10
+        px-6 py-6
+        flex flex-col gap-5
+        animate-dropdown
+      "
+            >
+              <Link
+                href="/"
+                onClick={() => setMobileOpen(false)}
+                className="text-white/80 hover:text-white text-lg font-medium"
+              >
+                Home
+              </Link>
+
+              <Link
+                href="/#about"
+                onClick={() => setMobileOpen(false)}
+                className="text-white/80 hover:text-white text-lg font-medium"
+              >
+                About
+              </Link>
+
+              <Link
+                href="/early-access"
+                onClick={() => setMobileOpen(false)}
+                className="text-white/80 hover:text-white text-lg font-medium"
+              >
+                Early Access
+              </Link>
+
+              <Link
+                href="#reach-us"
+                onClick={() => setMobileOpen(false)}
+                className="text-white/80 hover:text-white text-lg font-medium"
+              >
+                Reach Us
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* SEARCH BAR — only on home */}
         {showSearch && (

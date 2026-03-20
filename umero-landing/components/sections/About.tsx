@@ -61,22 +61,20 @@ export default function About() {
       {/* MASSIVE TITLE */}
       <div
         style={{
-          padding: "72px 0 0",
-          position: "relative",
-          zIndex: 0,
+          padding: "48px 0 0",
         }}
       >
         <div style={{ overflow: "hidden" }}>
           <h2
             style={{
               fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-              fontSize: "clamp(80px, 14vw, 200px)",
+              fontSize: "clamp(48px, 12vw, 140px)", // ✅ fixed
               fontWeight: 900,
               letterSpacing: "-0.04em",
               lineHeight: 0.9,
               margin: 0,
               color: "#0A0A0A",
-              paddingLeft: "48px",
+              paddingLeft: "16px", // ✅ mobile padding
               opacity: visible ? 1 : 0,
               animation: visible
                 ? "um-title-in .85s cubic-bezier(.16,1,.3,1) both"
@@ -87,17 +85,17 @@ export default function About() {
           </h2>
         </div>
 
-        <div style={{ overflow: "hidden", position: "relative" }}>
+        <div style={{ overflow: "hidden" }}>
           <h2
             style={{
               fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-              fontSize: "clamp(80px, 20vw, 280px)",
+              fontSize: "clamp(56px, 14vw, 180px)", // ✅ fixed
               fontWeight: 900,
               letterSpacing: "-0.04em",
               lineHeight: 0.88,
               margin: 0,
-              color: "#0000EE",
-              whiteSpace: "nowrap",
+              color: "#0000FF",
+              paddingLeft: "16px",
               opacity: visible ? 1 : 0,
               animation: visible
                 ? "um-title-in .85s cubic-bezier(.16,1,.3,1) both"
@@ -113,21 +111,17 @@ export default function About() {
       <div
         ref={ref}
         style={{
-          position: "relative",
-          zIndex: 1,
-          marginTop: "-60px",
-          padding: "0 48px 100px",
+          marginTop: "24px", // ✅ removed negative margin
+          padding: "0 16px 80px", // ✅ mobile safe padding
           background:
             "linear-gradient(to bottom, transparent 0%, #F7F7F7 120px)",
         }}
       >
         <div
+          className="grid grid-cols-1 md:grid-cols-3 gap-4" // ✅ FIXED GRID
           style={{
             maxWidth: "1200px",
             margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "16px",
           }}
         >
           {cards.map((c, i) => (
@@ -154,8 +148,8 @@ function Card({
 
   return (
     <div
-      className={`um-card ${dark ? "um-card-dark" : "um-card-light"}`}
       style={{
+        width: "100%", // ✅ prevents stretch issues
         background: dark ? "#0A0A0A" : "#FFFFFF",
         borderRadius: "20px",
         overflow: "hidden",
@@ -180,20 +174,13 @@ function Card({
         }}
       />
 
-      <div
-        style={{
-          padding: "28px 28px 32px",
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-        }}
-      >
+      <div style={{ padding: "24px" }}>
         <span className="um-tag">{card.tag}</span>
 
         <h3
           style={{
-            marginTop: "16px",
-            fontSize: "22px",
+            marginTop: "12px",
+            fontSize: "20px",
             fontWeight: 800,
             color: dark ? "#fff" : "#0A0A0A",
           }}
@@ -203,9 +190,9 @@ function Card({
 
         <p
           style={{
-            marginTop: "12px",
+            marginTop: "10px",
             fontSize: "13px",
-            lineHeight: 1.8,
+            lineHeight: 1.6,
             color: dark ? "rgba(255,255,255,.5)" : "rgba(0,0,0,.5)",
           }}
         >
@@ -214,7 +201,7 @@ function Card({
 
         <div
           style={{
-            marginTop: "18px",
+            marginTop: "14px",
             display: "flex",
             flexWrap: "wrap",
             gap: "6px",
