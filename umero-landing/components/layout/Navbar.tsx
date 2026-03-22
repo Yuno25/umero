@@ -246,13 +246,14 @@ export default function Navbar() {
         {showSearch && (
           <div
             ref={searchRef}
-            className={`hidden md:flex absolute left-1/2 -translate-x-1/2 top-[250px] w-full justify-center px-6 z-50 transition-all duration-300 ${
+            className={` search-wrapper flex md:flex absolute left-1/2 -translate-x-1/2 top-[250px] w-full justify-center px-6 z-50 transition-all duration-300 ${
               scrolled
                 ? "opacity-0 pointer-events-none -translate-y-2"
                 : "opacity-100"
             }`}
           >
             <div
+              className="search-bar-container"
               style={{
                 display: "flex",
                 alignItems: "stretch",
@@ -271,6 +272,7 @@ export default function Navbar() {
             >
               {/* ACTIVITY */}
               <div
+                className="search-item"
                 style={{
                   position: "relative",
                   flex: 1,
@@ -375,6 +377,7 @@ export default function Navbar() {
 
               {/* LOCATION */}
               <div
+                className="search-item"
                 style={{
                   position: "relative",
                   flex: 1,
@@ -475,6 +478,7 @@ export default function Navbar() {
 
               {/* TIME */}
               <div
+                className="search-item"
                 style={{
                   position: "relative",
                   flex: 1,
@@ -575,6 +579,7 @@ export default function Navbar() {
 
               {/* SEARCH BUTTON */}
               <button
+                className="search-button"
                 onClick={handleSearch}
                 style={{
                   background: "#0000FF",

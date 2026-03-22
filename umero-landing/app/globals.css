@@ -714,3 +714,55 @@ body {
     padding: 10px 14px !important;
   }
 }
+
+@media (max-width: 768px) {
+  .search-bar-container {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "activity activity"
+      "location time"
+      "button button";
+
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+
+    border-radius: 20px !important;
+    overflow: hidden;
+  }
+
+  /* Assign grid areas */
+  .search-item:nth-child(1) {
+    grid-area: activity;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .search-item:nth-child(2) {
+    grid-area: location;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .search-item:nth-child(3) {
+    grid-area: time;
+  }
+
+  .search-button {
+    grid-area: button;
+    width: 100% !important;
+    border-radius: 0 0 20px 20px !important;
+    padding: 16px !important;
+  }
+
+  /* Remove desktop flex constraints */
+  .search-item {
+    width: 100% !important;
+    flex: unset !important;
+  }
+}
+@media (max-width: 768px) {
+  .search-wrapper {
+    top: 22vh !important;
+  }
+}
