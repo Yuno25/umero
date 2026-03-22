@@ -31,7 +31,7 @@ export default function SpacesClient() {
     const fetchSpaces = async () => {
       try {
         const res = await fetch(
-          ${API}/api/spaces?activity=${activity}&location=${location}
+          `${API}/api/spaces?activity=${activity}&location=${location}`,
         );
         const data = await res.json();
         setSpaces(data);
@@ -44,11 +44,12 @@ export default function SpacesClient() {
     fetchSpaces();
   }, [activity, location]);
 
-  if (loading) return (
-    <main className="min-h-screen bg-white px-4 pt-36 pb-16">
-      <p className="text-center text-gray-500 pt-20">Loading spaces...</p>
-    </main>
-  );
+  if (loading)
+    return (
+      <main className="min-h-screen bg-white px-4 pt-36 pb-16">
+        <p className="text-center text-gray-500 pt-20">Loading spaces...</p>
+      </main>
+    );
 
   return (
     <main className="min-h-screen bg-white px-4 pt-36 pb-16">
@@ -68,9 +69,11 @@ export default function SpacesClient() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {spaces.map((space) => (
-            <Link href={/spaces/${space.id}} key={space.id}>
-              <div className="border rounded-2xl bg-white overflow-hidden
-                shadow-sm hover:shadow-md transition cursor-pointer">
+            <Link href={`/spaces/${space.id}`} key={space.id}>
+              <div
+                className="border rounded-2xl bg-white overflow-hidden
+                shadow-sm hover:shadow-md transition cursor-pointer"
+              >
                 <img
                   src={space.photos?.[0] || ""}
                   alt={space.name}
@@ -84,9 +87,11 @@ export default function SpacesClient() {
                   <p className="text-sm text-gray-600 mb-3">{space.city}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {space.activities?.map((act) => (
-                      <span key={act}
+                      <span
+                        key={act}
                         className="px-3 py-1 text-xs rounded-full
-                          bg-gray-100 text-gray-700 capitalize">
+                          bg-gray-100 text-gray-700 capitalize"
+                      >
                         {act}
                       </span>
                     ))}
@@ -95,8 +100,10 @@ export default function SpacesClient() {
                     <span className="text-lg font-semibold text-black">
                       ₹{space.pricePerHour}/hr
                     </span>
-                    <span className="px-4 py-2 rounded-lg bg-black
-                      text-white text-sm">
+                    <span
+                      className="px-4 py-2 rounded-lg bg-black
+                      text-white text-sm"
+                    >
                       View Space
                     </span>
                   </div>
@@ -109,4 +116,3 @@ export default function SpacesClient() {
     </main>
   );
 }
-
