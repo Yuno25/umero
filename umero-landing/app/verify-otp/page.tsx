@@ -22,12 +22,12 @@ export default function VerifyOTPPage() {
   //READ LOCALSTORAGE ONCE, SAFELY
   useEffect(() => {
     const context = localStorage.getItem("otp_context");
-    const signup = localStorage.getItem("pending_signup");
+    const signup = localStorage.getItem("pending_signup_data");
     const pendingEmail = localStorage.getItem("pending_email");
 
     setOtpContext(context === "signup" || context === "login" ? context : null);
     setPendingSignup(signup);
-    setEmail(signup ? JSON.parse(signup).email : pendingEmail);
+    setEmail(pendingEmail);
 
     setReady(true); // NOW guards may run
   }, []);
@@ -85,7 +85,10 @@ export default function VerifyOTPPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...signupData,
+          email,
+          password: signupData.password,
+          username: signupData.username,
+          contact: signupData.contact,
           mode: "complete-signup", // EXACT STRING
         }),
       });

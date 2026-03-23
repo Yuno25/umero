@@ -37,6 +37,7 @@ export async function GET() {
         username: user.username,
         email: user.email,
         lastAuthAction: user.lastAuthAction,
+        isOnboarding: !user.username,
       },
     });
   } catch (error) {

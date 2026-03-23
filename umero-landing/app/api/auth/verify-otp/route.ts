@@ -9,7 +9,8 @@ export async function POST(req: Request) {
   try {
     await connectDB();
 
-    const { email, otp } = await req.json();
+    const body = await req.json(); // ✅ ONLY ONCE
+    const { email, otp, username, contact, password } = body;
 
     if (!email || !otp) {
       return NextResponse.json(
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Validate OTP (safe string comparison)
+    // ✅ OTP VALIDATION
     if (!user.otp || String(user.otp) !== String(otp)) {
       return NextResponse.json({ error: "Invalid OTP" }, { status: 401 });
     }
@@ -33,27 +34,36 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "OTP expired" }, { status: 401 });
     }
 
-    // Clear OTP
+    // ✅ COMPLETE SIGNUP (if signup flow)
+    if (username && contact && password) {
+      const bcrypt = require("bcryptjs");
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      user.username = username;
+      user.contact = contact;
+      user.password = hashedPassword;
+      user.emailVerified = true;
+    }
+
+    // ✅ CLEAR OTP
     user.otp = null;
     user.otpExpiry = null;
 
     await user.save({ validateBeforeSave: false });
 
-    // CREATE JWT (THIS WAS MISSING)
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
-      expiresIn: "7d",
-    });
+    // ✅ CREATE JWT
+    const token = jwt.sign(
+      { userId: user._id.toString() },
+      process.env.JWT_SECRET!,
+      { expiresIn: "7d" },
+    );
 
-    // CREATE RESPONSE
     const response = NextResponse.json(
-      {
-        success: true,
-        message: "OTP verified successfully",
-      },
+      { success: true, message: "OTP verified successfully" },
       { status: 200 },
     );
 
-    //  SET COOKIE
+    // ✅ SET COOKIE
     response.cookies.set("umero_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -63,7 +73,7 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error) {
-    console.error("Verify OTP error:", error);
+    console.error("❌ Verify OTP error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

@@ -2,11 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
-  const router = useRouter();
-
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -16,6 +13,7 @@ export default function SignUpPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e: any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -23,34 +21,61 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    setError("");
 
+    // ✅ password check
     if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
 
     setLoading(true);
 
     try {
+      console.log("Sending OTP request...");
+
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          mode: "send-otp",
+        }),
       });
 
       const data = await res.json();
+      console.log("API RESPONSE:", data);
 
-      if (res.ok) {
-        // ✅ REDIRECT AFTER SUCCESS
-        router.push("/");
-        router.refresh();
-      } else {
-        alert(data.message || "Signup failed");
+      if (!res.ok) {
+        setError(data.error || "Failed to send OTP");
+        setLoading(false);
+        return;
       }
+
+      // ✅ STORE DATA FOR NEXT STEP
+      localStorage.setItem("pending_email", form.email);
+      localStorage.setItem("otp_context", "signup");
+
+      // IMPORTANT: match backend naming
+      localStorage.setItem(
+        "pending_signup_data",
+        JSON.stringify({
+          username: form.username,
+          contact: form.phone, // 👈 FIXED
+          password: form.password,
+        }),
+      );
+
+      console.log("Redirecting to /verify-otp");
+
+      // ✅ HARD REDIRECT (guaranteed)
+      window.location.href = "/verify-otp";
     } catch (err) {
-      alert("Something went wrong");
+      console.error(err);
+      setError("Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -64,16 +89,15 @@ export default function SignUpPage() {
           <h1 className="text-3xl font-bold text-white">
             Create your <span className="text-purple-400">Umero</span> account
           </h1>
-
           <p className="text-gray-400 mt-2 text-sm">
             Your previous submissions will be linked automatically
           </p>
         </div>
 
-        {/* CARD */}
+        {/* FORM */}
         <form
           onSubmit={handleSubmit}
-          className="bg-[#0b1220] border border-white/10 rounded-2xl p-8 shadow-xl backdrop-blur"
+          className="bg-[#0b1220] border border-white/10 rounded-2xl p-8 shadow-xl"
         >
           <h2 className="text-xl font-semibold text-white mb-6">
             Create Account
@@ -109,26 +133,21 @@ export default function SignUpPage() {
               onChange={handleChange}
             />
 
-            {/* BUTTON */}
+            {error && <p className="text-sm text-red-400">{error}</p>}
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-4 py-3 rounded-xl font-semibold text-white 
-              bg-gradient-to-r from-purple-500 to-purple-600
-              hover:from-purple-400 hover:to-purple-500
-              transition-all duration-200 disabled:opacity-50"
+              className="w-full py-3 rounded-xl font-semibold text-white 
+              bg-gradient-to-r from-purple-500 to-purple-600"
             >
-              {loading ? "Creating..." : "Create Account"}
+              {loading ? "Sending OTP..." : "Continue"}
             </button>
           </div>
 
-          {/* SIGN IN LINK */}
           <p className="text-sm text-gray-400 text-center mt-6">
             Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-purple-400 hover:text-purple-300 font-medium"
-            >
+            <Link href="/login" className="text-purple-400">
               Sign in
             </Link>
           </p>
@@ -138,28 +157,16 @@ export default function SignUpPage() {
   );
 }
 
-function Input({
-  name,
-  placeholder,
-  type = "text",
-  onChange,
-}: {
-  name: string;
-  placeholder: string;
-  type?: string;
-  onChange: (e: any) => void;
-}) {
+function Input({ name, placeholder, type = "text", onChange }: any) {
   return (
     <input
       name={name}
       type={type}
       placeholder={placeholder}
       onChange={onChange}
+      required
       className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3
-      text-white placeholder-gray-500
-      focus:outline-none focus:border-purple-500
-      focus:ring-2 focus:ring-purple-500/20
-      transition"
+      text-white placeholder-gray-500 focus:border-purple-500"
     />
   );
 }
