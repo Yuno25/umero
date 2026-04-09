@@ -1,13 +1,5 @@
 import { Resend } from "resend";
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-
-if (!RESEND_API_KEY) {
-  throw new Error("RESEND_API_KEY is not defined in environment variables");
-}
-
-const resend = new Resend(RESEND_API_KEY);
-
 interface SendOTPParams {
   email: string;
   otp: string;
@@ -15,6 +7,16 @@ interface SendOTPParams {
 
 export const sendOTPEmail = async ({ email, otp }: SendOTPParams) => {
   try {
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
+
+    // Move check INSIDE function
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not defined");
+    }
+
+    //Initialize inside function
+    const resend = new Resend(RESEND_API_KEY);
+
     const { data, error } = await resend.emails.send({
       from: "Umero <noreply@umero.in>",
       to: email,
