@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { Mail, Linkedin, Instagram, X } from "lucide-react";
 import useInView from "@/hooks/useInView";
+
 const socialLinks = [
   {
     name: "LinkedIn",
@@ -54,11 +55,11 @@ export default function ReachUs() {
   return (
     <section
       id="reach-us"
-      className="relative w-full bg-black pt-36 pb-20 overflow-hidden"
+      className="relative w-full bg-black pt-36 md:pb-20 overflow-hidden"
     >
       {/* WATERMARK */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-        <h1 className="watermark-umero">UMERO</h1>
+        <h1 className="watermark-umero opacity-100">UMERO</h1>
       </div>
 
       {/* TOP DIVIDER */}
@@ -66,14 +67,15 @@ export default function ReachUs() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         <div className="flex flex-col items-center text-center">
-          {/* TITLE */}
+          {/* IMPROVED TITLE */}
           <h2 className="mb-4 text-4xl md:text-5xl font-semibold text-white tracking-wide">
-            Reach Us
+            Let’s Connect
           </h2>
 
-          {/* SUBTITLE */}
-          <p className="mb-14 max-w-md text-white/70 text-lg leading-relaxed">
-            Have questions or want to collaborate? Reach out to us anytime.
+          {/* BETTER SUBTEXT */}
+          <p className="mb-14 max-w-lg text-white/60 text-lg leading-relaxed">
+            Whether you're looking for a space, listing one, or exploring
+            partnerships — we’d love to hear from you.
           </p>
 
           {/* ICON ROW */}
@@ -101,7 +103,6 @@ export default function ReachUs() {
                 >
                   <Icon className="h-5 w-5 text-gray-400 transition-colors duration-300 group-hover:text-purple-400" />
 
-                  {/* TOOLTIP */}
                   <span className="pointer-events-none absolute -top-10 scale-0 rounded bg-black px-2 py-1 text-xs text-white transition-all duration-200 group-hover:scale-100">
                     {item.name}
                   </span>
@@ -111,10 +112,56 @@ export default function ReachUs() {
           </div>
         </div>
 
+        {/* NEW: FOOTER LINKS (LIKE IMAGE, SAME LAYOUT ZONE) */}
+        <div className="mt-32 md:mt-40 grid grid-cols-2 md:grid-cols-4 gap-10 text-sm text-white/60">
+          <div>
+            <h4 className="text-white mb-4 font-medium">Product</h4>
+            <ul className="space-y-2">
+              <li className="hover:text-white transition">Browse Listings</li>
+              <li className="hover:text-white transition">Post a Space</li>
+              <li className="hover:text-white transition">Pricing</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white mb-4 font-medium">Company</h4>
+            <ul className="space-y-2">
+              <li className="hover:text-white transition">About Us</li>
+              <li className="hover:text-white transition">Careers</li>
+              <li className="hover:text-white transition">Contact</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white mb-4 font-medium">Support</h4>
+            <ul className="space-y-2">
+              <li className="hover:text-white transition">Help Center</li>
+              <li className="hover:text-white transition">FAQs</li>
+              <li className="hover:text-white transition">Report Issue</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white mb-4 font-medium">Legal</h4>
+            <ul className="space-y-2">
+              <li className="hover:text-white transition">Privacy Policy</li>
+              <li className="hover:text-white transition">Terms of Service</li>
+            </ul>
+          </div>
+        </div>
+
         {/* FOOTER BASE */}
-        <div className="mt-24 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between text-sm text-white/40">
-          <span>© {new Date().getFullYear()} Umero</span>
-          <span className="mt-2 md:mt-0">Built for modern living</span>
+        <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between text-sm text-white/40">
+          <span>© {new Date().getFullYear()} Umero. All rights reserved.</span>
+
+          <div className="flex gap-6 mt-2 md:mt-0">
+            <span className="hover:text-white transition cursor-pointer">
+              Privacy
+            </span>
+            <span className="hover:text-white transition cursor-pointer">
+              Terms
+            </span>
+          </div>
         </div>
       </div>
     </section>

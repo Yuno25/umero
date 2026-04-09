@@ -104,14 +104,19 @@ export default function Navbar() {
         }
       `}</style>
 
-      <header className="fixed top-0 left-0 w-full z-50">
+      <header className="fixed top-0 left-0 w-full z-30">
         {/* NAVBAR */}
         <div
           className={`relative flex items-center justify-between px-4 md:px-12 py-4 md:py-6 transition-all duration-300 ${navBg}`}
         >
           {/* LEFT — BURGER (MOBILE ONLY) */}
           <div className="md:hidden">
-            <button onClick={() => setMobileOpen(true)} className="text-white">
+            <button
+              aria-label="Open navigation menu"
+              title="Open navigation menu"
+              onClick={() => setMobileOpen(true)}
+              className="text-white"
+            >
               <Menu size={26} />
             </button>
           </div>
@@ -148,7 +153,12 @@ export default function Navbar() {
             )}
 
             {!loading && user && (
-              <UserAvatar onClick={() => setDrawerOpen(true)} />
+              <div
+                onClick={() => setDrawerOpen(true)}
+                className="cursor-pointer"
+              >
+                <UserAvatar />
+              </div>
             )}
           </div>
 
@@ -157,7 +167,7 @@ export default function Navbar() {
             <nav className="flex items-center gap-3">
               <TopNavItem href="/">Home</TopNavItem>
               <TopNavItem href="/#about">About</TopNavItem>
-              <TopNavItem href="/early-access">Early Access</TopNavItem>
+              <TopNavItem href="/#events">Events</TopNavItem>
               <TopNavItem href="#reach-us">Reach Us</TopNavItem>
             </nav>
 
@@ -176,7 +186,12 @@ export default function Navbar() {
                   onClick={() => setDrawerOpen(true)}
                   className="ml-4 cursor-pointer"
                 >
-                  <UserAvatar onClick={() => setDrawerOpen(true)} />
+                  <div
+                    onClick={() => setDrawerOpen(true)}
+                    className="cursor-pointer"
+                  >
+                    <UserAvatar />
+                  </div>
                 </div>
 
                 <SideDrawer
@@ -191,7 +206,7 @@ export default function Navbar() {
           <div className="absolute top-full left-0 w-full z-50">
             {/* BACKDROP (click outside to close) */}
             <div
-              className="fixed inset-0 z-40"
+              className="fixed inset-0 z-40 bg-black/30"
               onClick={() => setMobileOpen(false)}
             />
 
@@ -199,7 +214,7 @@ export default function Navbar() {
             <div
               ref={mobileRef}
               className="
-        relative z-50
+        relative z-[60]
         bg-black/95 backdrop-blur
         border-t border-white/10
         px-6 py-6
@@ -224,11 +239,11 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="/early-access"
+                href="/#events"
                 onClick={() => setMobileOpen(false)}
                 className="text-white/80 hover:text-white text-lg font-medium"
               >
-                Early Access
+                Events
               </Link>
 
               <Link
@@ -246,9 +261,11 @@ export default function Navbar() {
         {showSearch && (
           <div
             ref={searchRef}
-            className={` search-wrapper flex md:flex absolute left-1/2 -translate-x-1/2 top-[250px] w-full justify-center px-6 z-50 transition-all duration-300 ${
+            className={` search-wrapper flex md:flex absolute left-1/2 -translate-x-1/2 
+${mobileOpen ? "top-[380px]" : "top-[250px]"} 
+w-full justify-center px-6 z-40 transition-all duration-300 ${
               scrolled
-                ? "opacity-0 pointer-events-none -translate-y-2"
+                ? "opacity-0 pointer-events-none -translate-y-6"
                 : "opacity-100"
             }`}
           >
@@ -607,6 +624,7 @@ export default function Navbar() {
           </div>
         )}
       </header>
+      <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </>
   );
 }

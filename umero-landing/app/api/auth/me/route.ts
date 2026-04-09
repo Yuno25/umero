@@ -1,46 +1,33 @@
+// app/api/auth/me/route.ts
+import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import * as jwt from "jsonwebtoken";
-import connectDB from "@/lib/db";
-import User from "@/models/User";
+import { prisma } from "@/lib/prisma";
+
+export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    await connectDB();
-
-    const cookieStore = cookies();
-
-    // Support both old & new cookie names (safe)
-    const token =
-      cookieStore.get("umero_token")?.value || cookieStore.get("token")?.value;
-
-    if (!token) {
-      return NextResponse.json({ user: null }, { status: 200 });
-    }
+    const token = cookies().get("umero_token")?.value;
+    if (!token) return NextResponse.json({ user: null }, { status: 200 });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
       userId: string;
     };
 
-    //  Fetch fresh user data
-    const user = await User.findById(decoded.userId).select(
-      "username email lastAuthAction",
-    );
-
-    if (!user) {
-      return NextResponse.json({ user: null }, { status: 200 });
-    }
-
-    return NextResponse.json({
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        lastAuthAction: user.lastAuthAction,
-        isOnboarding: !user.username,
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        avatar: true,
+        emailVerified: true,
       },
     });
-  } catch (error) {
+
+    return NextResponse.json({ user });
+  } catch {
     return NextResponse.json({ user: null }, { status: 200 });
   }
 }

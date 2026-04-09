@@ -1,16 +1,13 @@
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db";
-import User from "@/models/User";
+import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    await connectDB();
-
-    const body = await req.json(); // ✅ ONLY ONCE
-    const { email, otp, username, contact, password } = body;
+    const body = await req.json();
+    const { email, otp } = body;
 
     if (!email || !otp) {
       return NextResponse.json(
@@ -19,61 +16,48 @@ export async function POST(req: Request) {
       );
     }
 
-    const user = await User.findOne({ email });
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // ✅ OTP VALIDATION
     if (!user.otp || String(user.otp) !== String(otp)) {
       return NextResponse.json({ error: "Invalid OTP" }, { status: 401 });
     }
 
-    if (!user.otpExpiry || user.otpExpiry < new Date()) {
+    if (!user.otpExpiry || new Date(user.otpExpiry) < new Date()) {
       return NextResponse.json({ error: "OTP expired" }, { status: 401 });
     }
 
-    // ✅ COMPLETE SIGNUP (if signup flow)
-    if (username && contact && password) {
-      const bcrypt = require("bcryptjs");
-      const hashedPassword = await bcrypt.hash(password, 10);
+    // Clear OTP fields only — don't touch username/contact/password here
+    await prisma.user.update({
+      where: { email },
+      data: {
+        otp: null,
+        otpExpiry: null,
+        // For login flow, mark verified
+        emailVerified: true,
+      },
+    });
 
-      user.username = username;
-      user.contact = contact;
-      user.password = hashedPassword;
-      user.emailVerified = true;
-    }
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
+      expiresIn: "6h",
+    });
 
-    // ✅ CLEAR OTP
-    user.otp = null;
-    user.otpExpiry = null;
+    const response = NextResponse.json({ success: true }, { status: 200 });
 
-    await user.save({ validateBeforeSave: false });
-
-    // ✅ CREATE JWT
-    const token = jwt.sign(
-      { userId: user._id.toString() },
-      process.env.JWT_SECRET!,
-      { expiresIn: "7d" },
-    );
-
-    const response = NextResponse.json(
-      { success: true, message: "OTP verified successfully" },
-      { status: 200 },
-    );
-
-    // ✅ SET COOKIE
     response.cookies.set("umero_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
+      maxAge: 60 * 60 * 6,
     });
 
     return response;
   } catch (error) {
-    console.error("❌ Verify OTP error:", error);
+    console.error("Verify OTP error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

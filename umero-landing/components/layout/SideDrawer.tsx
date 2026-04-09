@@ -38,16 +38,23 @@ export default function SideDrawer({
   };
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    await refreshAuth(); // Refresh auth state to clear user data
-    router.push("/");
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      cache: "no-store",
+    });
+
+    await refreshAuth();
     onClose();
+
+    // Force full reload so cookie state is completely fresh
+    window.location.href = "/";
   };
 
   return (
     <>
       {/* Overlay */}
       <div
+        onClick={onClose}
         className={`fixed inset-0 z-[9998] bg-black/40 transition-opacity duration-300 ${
           open
             ? "opacity-100 pointer-events-auto"
@@ -59,10 +66,10 @@ export default function SideDrawer({
       <aside
         ref={drawerRef}
         className={`fixed top-0 right-0 z-[9999] h-full w-[280px]
-        bg-[#0b0f1a]/80 backdrop-blur-xl
-        border-l border-white/10
-        transform transition-transform duration-300 ease-out
-        ${open ? "translate-x-0" : "translate-x-full"}`}
+  bg-[#0b0f1a]/90 backdrop-blur-xl
+  border-l border-white/10
+  transform will-change-transform transition-transform duration-300 ease-out
+  ${open ? "translate-x-0" : "translate-x-full"}`}
       >
         <div className="p-6 flex flex-col h-full text-white">
           {/* ===== IF USER LOGGED IN ===== */}

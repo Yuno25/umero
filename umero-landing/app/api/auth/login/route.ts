@@ -1,43 +1,56 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/db";
-import User from "@/models/User";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
 import { generateOTP, getOTPExpiry } from "@/lib/otp";
 import { sendOTPEmail } from "@/lib/sendEmail";
 
 export async function POST(req: Request) {
   try {
-    await connectDB();
-
     const body = await req.json();
     const email = body.email?.trim().toLowerCase();
+    const password = body.password;
 
-    if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: "Email and password are required" },
+        { status: 400 },
+      );
     }
 
-    const user = await User.findOne({ email });
+    const user = await prisma.user.findUnique({ where: { email } });
 
-    if (!user) {
+    if (!user || !user.password) {
       return NextResponse.json(
         { error: "No account found with this email" },
         { status: 404 },
       );
     }
 
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return NextResponse.json(
+        { error: "Incorrect password" },
+        { status: 401 },
+      );
+    }
+
     const otp = generateOTP();
 
-    user.otp = otp;
-    user.otpExpiry = getOTPExpiry();
-    user.lastAuthAction = "login";
-
-    await user.save({ validateBeforeSave: false });
+    await prisma.user.update({
+      where: { email },
+      data: {
+        otp,
+        otpExpiry: getOTPExpiry(),
+        lastAuthAction: "login",
+      },
+    });
 
     await sendOTPEmail({ email, otp });
 
     return NextResponse.json({
       success: true,
       otpRequired: true,
-      message: "OTP sent to your email. Please verify.",
+      message: "OTP sent to your email.",
     });
   } catch (error: any) {
     console.error("Login error:", error);

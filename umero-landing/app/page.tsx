@@ -1,13 +1,10 @@
 import Hero from "@/components/sections/Hero";
 import About from "@/components/sections/About";
 import WhyUmero from "@/components/sections/WhyUmero";
-import EarlyAccessSection from "@/components/sections/EarlyAccessSection";
+import EventSection from "@/components/sections/EventSection";
 import ReachUs from "@/components/sections/ReachUs";
 import HomeClient from "@/components/HomeClient";
 import HostSection from "@/components/sections/HostSection";
-
-
-
 
 export default function HomePage() {
   return (
@@ -16,10 +13,9 @@ export default function HomePage() {
       <Hero />
       <About />
       <WhyUmero />
-      <HostSection/>
-      <EarlyAccessSection />
+      <HostSection />
+      <EventSection />
       <ReachUs />
-     
     </>
   );
 }

@@ -571,29 +571,28 @@ body {
   }
 }
 
-.um-card {
-  transition:
-    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.um-card:hover {
-  transform: translateY(-7px) !important;
-}
-
-.um-card-light:hover {
-  box-shadow: 0 24px 56px gray !important;
-}
-
-.um-card-dark:hover {
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.55) !important;
-}
-
+/* ── TAG pill ── */
 .um-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(29, 78, 216, 0.25);
+  background: rgba(0, 0, 255, 0.07);
+  color: #1d4ed8;
   transition:
     background 0.25s,
     color 0.25s,
     border-color 0.25s;
+}
+
+.um-card-dark .um-tag {
+  background: rgba(255, 255, 255, 0.1);
+  color: #93c5fd;
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .um-card-light:hover .um-tag {
@@ -607,6 +606,45 @@ body {
   color: black !important;
   border-color: #fff !important;
 }
+
+/* ── CHIP pill ── */
+.chip {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 255, 0.06);
+  color: #1e40af;
+  border: 1px solid rgba(29, 78, 216, 0.2);
+  letter-spacing: 0.01em;
+}
+
+.um-card-dark .chip {
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ── CARD hover pop-out ── */
+.um-card {
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.um-card:hover {
+  transform: translateY(-18px) scale(1.025) !important;
+}
+
+.um-card-light:hover {
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.18) !important;
+}
+
+.um-card-dark:hover {
+  box-shadow: 0 32px 80px rgba(0, 0, 255, 0.22) !important;
+}
+
 .animate-in {
   animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }

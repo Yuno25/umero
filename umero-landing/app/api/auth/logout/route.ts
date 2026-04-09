@@ -5,8 +5,10 @@ export async function POST() {
 
   response.cookies.set("umero_token", "", {
     httpOnly: true,
-    expires: new Date(0),
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
     path: "/",
+    maxAge: 0, // THIS is important
   });
 
   return response;
