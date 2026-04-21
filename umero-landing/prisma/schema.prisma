@@ -14,6 +14,12 @@ model User {
   contact        String?
   password       String?
   emailVerified  Boolean  @default(false)
+  phone   String?
+city    String?
+state   String?
+address String?
+gender  String?
+age     Int?
 
   otp            String?
   otpExpiry      DateTime?
@@ -41,4 +47,24 @@ model Renter {
   userId String? @db.ObjectId
 
   @@map("renters")
+}
+model Booking {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  spaceId      String
+  spaceName    String
+  hostEmail    String
+  renterId     String
+  renterEmail  String
+
+  bookingDate  String
+  startTime    String
+  endTime      String
+
+  totalHours   Float
+  totalPrice   Int
+
+  status       String   @default("PENDING")
+
+  createdAt    DateTime @default(now())
 }

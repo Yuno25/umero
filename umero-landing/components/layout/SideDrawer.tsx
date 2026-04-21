@@ -78,7 +78,7 @@ export default function SideDrawer({
               {/* User Info */}
               <div className="mb-8">
                 <div className="text-lg font-semibold">
-                  {user.username || user.email}
+                  {user.username?.trim() || user.email?.split("@")[0]}
                 </div>
                 <div className="text-sm text-white/60">{user.email}</div>
               </div>
@@ -89,6 +89,20 @@ export default function SideDrawer({
                   className="nav-glow relative px-4 py-3 rounded-xl text-white/90 transition-all duration-300 hover:text-white text-left"
                 >
                   Profile
+                </button>
+
+                <button
+                  onClick={() => navigate("/booking")}
+                  className="nav-glow relative px-4 py-3 rounded-xl text-white/90 transition-all duration-300 hover:text-white text-left"
+                >
+                  My Bookings
+                </button>
+
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="nav-glow relative px-4 py-3 rounded-xl text-white/90 transition-all duration-300 hover:text-white text-left"
+                >
+                  Host Dashboard
                 </button>
 
                 {/* My Properties Dropdown */}

@@ -23,6 +23,12 @@ export async function GET() {
         username: true,
         avatar: true,
         emailVerified: true,
+        phone: true,
+        city: true,
+        state: true,
+        address: true,
+        gender: true,
+        age: true,
       },
     });
 
