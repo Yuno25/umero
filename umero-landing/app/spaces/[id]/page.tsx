@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useAuth } from "@/lib/useAuth";
 const API = process.env.NEXT_PUBLIC_API_URL;
 type Space = {
   id: string;
@@ -25,6 +26,7 @@ type Space = {
 };
 export default function SpacePage() {
   const { id } = useParams();
+  const { user } = useAuth();
   const [space, setSpace] = useState<Space | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -60,8 +62,8 @@ export default function SpacePage() {
             spaceId: space!.id,
             spaceName: space!.name,
             hostEmail: space!.hostEmail,
-            renterId: "guest",
-            renterEmail: "guest@umero.in",
+            renterId: user?.id ?? "guest",
+            renterEmail: user?.email ?? "guest@umero.in",
             bookingDate: selectedDate,
             startTime: startTime,
             endTime: endTime,
@@ -280,9 +282,26 @@ export default function SpacePage() {
                   </span>
                 </div>
               </div>
+              {!user && (
+                <p className="text-sm text-center text-red-500 mb-3">
+                  Please log in to book this space
+                </p>
+              )}
               {bookingSuccess ? (
-                <div className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold text-sm text-center">
-                  Booking Requested Successfully
+                <div className="text-center mt-4">
+                  <p className="text-green-600 font-semibold mb-3">
+                    Booking Requested Successfully
+                  </p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Host will respond within 24 hours.
+                    You will receive an email confirmation.
+                  </p>
+                  <a
+                    href="/booking"
+                    className="inline-block bg-black text-white px-6 py-2 rounded-xl text-sm font-semibold"
+                  >
+                    View My Bookings
+                  </a>
                 </div>
               ) : (
                 <button
