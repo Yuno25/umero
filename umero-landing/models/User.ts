@@ -39,7 +39,7 @@ const UserSchema = new mongoose.Schema(
     // AUTH CONTEXT
     lastAuthAction: {
       type: String,
-      enum: ["signup", "login"],
+      enum: ["signup", "login", "reset"],
       default: null,
     },
 

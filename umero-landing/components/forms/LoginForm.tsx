@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -485,6 +486,9 @@ export default function LoginForm() {
               <button type="submit" disabled={loading} className="submit-btn">
                 {loading ? "Sending OTP..." : "Log in →"}
               </button>
+              <Link href="/forgot-password" className="text-sm text-blue-500">
+                Forgot Password?
+              </Link>
             </form>
 
             <div className="signup-link">

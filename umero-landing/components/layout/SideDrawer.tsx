@@ -13,7 +13,7 @@ export default function SideDrawer({
 }) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { user, refreshAuth } = useAuth(); // ✅ get logged-in user
+  const { user, refreshAuth } = useAuth(); //  get logged-in user
   const [propertyOpen, setPropertyOpen] = useState(false);
 
   useEffect(() => {
